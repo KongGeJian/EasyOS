@@ -1,0 +1,9 @@
+".\Objects\STARTUP.obj",
+".\Objects\os.obj",
+".\Objects\os_timer.obj",
+".\Objects\lib_delay.obj",
+".\Objects\main.obj" 
+TO ".\Objects\OS_Test" 
+
+PRINT(".\Listings\OS_Test.map") IXREF 
+REMOVEUNUSED 
