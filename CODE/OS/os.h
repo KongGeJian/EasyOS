@@ -32,9 +32,22 @@
 *********************************************************************************************************
 */
 
-#define OS_TASKS_LEN    6  //最大可运行任务数
+#define OS_TASKS_NUM    3  //最大可运行任务数
+#define OS_TASKS_STACK_LEN = {16, 16, 16} //每个任务对应栈大小，最小 16byte
 
 typedef  void (*TaskHook)(void); //任务函数钩子
+
+
+//任务状态  TODO https://zhuanlan.zhihu.com/p/503838768
+typedef enum
+{
+    NONE,
+    READY = 1,  //1-就绪：已具备执行能力，等待调度器调度
+    RUNNING,    //2-运行：任务正在执行，此时它占用CPU
+    BLOCKED,    //3-阻塞：当前任务正在等待某个时序或外部中断，该任务不在就绪列表中。包含任务被挂起、任务被延时、任务正在等待信号量、读写队列或者等待读写事件等。
+    SUSPENDED,  //4-挂起：处于挂起态的任务对调度器而言是不可见的，任务进入挂起状态的唯一办法就是调用 vTaskSuspend()函数；挂起状态的任务恢复的唯一途径是调用 vTaskResume() 或vTaskResumeFromISR()函数
+} OS_TASK_STATE_E_TYP;
+
 
 
 /*

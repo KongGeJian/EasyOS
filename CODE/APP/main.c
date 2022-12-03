@@ -11,14 +11,20 @@
 
 void task1()
 {
-    P10 = ~P10;
-    delay_ms(2);
+    while (1)
+    {
+        P10 = ~P10;
+        delay_ms(2);
+    }
 }
 
 void task2()
 {
-    P11 = ~P11;
-    delay_ms(5);
+    while (1)
+    {
+        P11 = ~P11;
+        delay_ms(5);
+    }
 }
 
 void createTask()
