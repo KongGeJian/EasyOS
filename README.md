@@ -42,7 +42,7 @@ T0作为系统时钟定时器，设定一个系统时钟os_tick=1ms；
 
 ## 简单调度
 
-> git 检出 tag xxx
+> `git checkout feature/simple-scheduling`
 
 特点：
 + 创建任务自定义周期时间
@@ -56,7 +56,7 @@ T0作为系统时钟定时器，设定一个系统时钟os_tick=1ms；
 
 ## 固定时间片调度
 
-> git 检出 tag xxx
+> `git checkout feature/fixed-time-slice-scheduling`
 
 特点：
 + xxx
