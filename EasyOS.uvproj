@@ -46,7 +46,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>OS_Test</OutputName>
+          <OutputName>EasyOS</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -324,7 +324,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE</IncludePath>
+              <IncludePath>C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS</IncludePath>
             </VariousControls>
           </C51>
           <Ax51>
@@ -374,98 +374,70 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Source Group 1</GroupName>
+          <GroupName>APP</GroupName>
           <Files>
             <File>
               <FileName>STARTUP.A51</FileName>
               <FileType>2</FileType>
-              <FilePath>.\STARTUP.A51</FilePath>
+              <FilePath>.\CODE\APP\STARTUP.A51</FilePath>
             </File>
             <File>
               <FileName>cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\CODE\cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>os.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\CODE\os.c</FilePath>
-            </File>
-            <File>
-              <FileName>os.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\CODE\os.h</FilePath>
-            </File>
-            <File>
-              <FileName>os_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\CODE\os_timer.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>2</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>1</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>1</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                  <BankNo>65535</BankNo>
-                </CommonProperty>
-                <File51>
-                  <C51>
-                    <RegisterColoring>2</RegisterColoring>
-                    <VariablesInOrder>2</VariablesInOrder>
-                    <IntegerPromotion>2</IntegerPromotion>
-                    <uAregs>2</uAregs>
-                    <UseInterruptVector>2</UseInterruptVector>
-                    <Fuzzy>8</Fuzzy>
-                    <Optimize>10</Optimize>
-                    <WarningLevel>3</WarningLevel>
-                    <SizeSpeed>2</SizeSpeed>
-                    <ObjectExtend>2</ObjectExtend>
-                    <ACallAJmp>2</ACallAJmp>
-                    <InterruptVectorAddress>0</InterruptVectorAddress>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </C51>
-                </File51>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>os_timer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\CODE\os_timer.h</FilePath>
-            </File>
-            <File>
-              <FileName>lib_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\CODE\lib_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>lib_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\CODE\lib_delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>lib_stdint.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\CODE\lib_stdint.h</FilePath>
+              <FilePath>.\CODE\APP\cfg.h</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\CODE\main.c</FilePath>
+              <FilePath>.\CODE\APP\main.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP</GroupName>
+        </Group>
+        <Group>
+          <GroupName>EXT-LIB</GroupName>
+          <Files>
+            <File>
+              <FileName>lib_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CODE\EXT-LIB\lib_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>lib_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CODE\EXT-LIB\lib_delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>lib_stdint.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CODE\EXT-LIB\lib_stdint.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CODE\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CODE\OS\os.h</FilePath>
+            </File>
+            <File>
+              <FileName>os_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CODE\OS\os_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CODE\OS\os_timer.h</FilePath>
             </File>
           </Files>
         </Group>

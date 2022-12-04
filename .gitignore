@@ -57,8 +57,11 @@ dkms.conf
 ## Keil5
 # Listings
 *.lst
+*.i
 *.m51
 # Objects
 *.build_log.htm
 *.__i
+*._ia
+
 
