@@ -28,6 +28,8 @@
 #define     SYSclk      FOSC/1          //系统时钟 1T
 //#define     SYSclk      FOSC/12         //系统时钟 12T
 
+#define     DEBUG_USE_SIMULATOR     1   //使用模拟器Debug
+
 
 
 #endif

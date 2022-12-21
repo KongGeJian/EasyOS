@@ -75,9 +75,11 @@ static const char xdata strbuf[STRBUF_LEN];
 */
 
 /*串口1发送字节*/
-static void UART1_SendByte(byte dat) compact
+static void UART1_SendByte(byte dat) compact reentrant
 {
+#if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
+#endif
     ACC = dat;              //计算偶数奇偶校验位P（PSW.0）
     if (P)                  //根据P设置奇偶校验位
     {
@@ -100,9 +102,11 @@ static void UART1_SendByte(byte dat) compact
 }
 
 /*串口2发送字节*/
-static void UART2_SendByte(byte dat) compact
+static void UART2_SendByte(byte dat) compact reentrant
 {
+#if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
+#endif
     ACC = dat;              //计算偶数奇偶校验位P（PSW.0）
     if (P)                  //根据P设置奇偶校验位
     {
@@ -214,7 +218,7 @@ void BSP_UART_Init(void) large
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void BSP_UART_SendByte(UART_E_TYP UART, byte dat) large
+void BSP_UART_SendByte(UART_E_TYP UART, byte dat) large reentrant
 {
     if (UART == UART1)
         UART1_SendByte(dat);
@@ -234,7 +238,7 @@ void BSP_UART_SendByte(UART_E_TYP UART, byte dat) large
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void BSP_UART_SendString(UART_E_TYP UART, char *s) large
+void BSP_UART_SendString(UART_E_TYP UART, char *s) large reentrant
 {
     if (UART == UART1)
         while (*s)                //检查字符串的结尾
@@ -254,7 +258,7 @@ void BSP_UART_SendString(UART_E_TYP UART, char *s) large
 * Return(s)   : none.
 *********************************************************************************************************
 */
-void BSP_UART_Println(UART_E_TYP UART, const char *format, ...) large
+void BSP_UART_Println(UART_E_TYP UART, const char *format, ...) large reentrant
 {
     va_list aptr;
 

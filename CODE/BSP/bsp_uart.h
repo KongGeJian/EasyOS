@@ -53,9 +53,9 @@ extern char xdata strbuf[];
 
 extern void  BSP_UART_Init(void) large;
 
-extern void  BSP_UART_SendByte(UART_E_TYP UART, byte dat) large;
-extern void  BSP_UART_SendString(UART_E_TYP UART, char *s) large;
-extern void  BSP_UART_Println(UART_E_TYP UART, const char *format, ...) large;
+extern void  BSP_UART_SendByte(UART_E_TYP UART, byte dat) large reentrant;
+extern void  BSP_UART_SendString(UART_E_TYP UART, char *s) large reentrant;
+extern void  BSP_UART_Println(UART_E_TYP UART, const char *format, ...) large reentrant;
 
 
 #endif

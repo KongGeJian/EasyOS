@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include <intrins.h>
 
-#include "cfg.h"
+#include "bsp.h"
 
 
-#include "lib_delay.h"
-#include "lib_stdint.h"
-
+u8 idata task1_stack[20];
+u8 idata task2_stack[20];
+const char code task1_name[] = "task1";
+const char code task2_name[] = "task2";
 
 void task1()
 {
@@ -29,8 +30,8 @@ void task2()
 
 void createTask()
 {
-    OS_CreateTask(0, 20, task1);
-    OS_CreateTask(10, 10, task2);
+    OS_CreateTask(task1, task1_name, task1_stack, sizeof(task1_stack));
+    OS_CreateTask(task2, task2_name, task2_stack, sizeof(task2_stack));
 }
 
 void main()
@@ -41,8 +42,4 @@ void main()
     createTask();
     
     OS_Start();
-    while (1)
-    {
-        OS_TaskProcess();
-    }
 }

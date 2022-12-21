@@ -27,6 +27,9 @@
 
 volatile u32 data os_tick;  //系统计时器，无符号32位(4字节)
 volatile bit data os_start_enable; //启动标识
+volatile u8 data os_time;
+
+u8 xdata origin_sp; //原始栈指针
 
 
 
@@ -36,17 +39,35 @@ volatile bit data os_start_enable; //启动标识
 *********************************************************************************************************
 */
 
-/*T0中断服务程序*/
-void T0_ISR() interrupt 1 using 1
+/*T0中断服务程序*/ //TODO后面用ASM实现
+void T0_ISR() interrupt 1
 {
-    os_tick++;
+    //==压栈==
+    //记录当前任务栈顶
+    if (running_task != NULL)
+        running_task->stack->sp = (uint8_t idata *)SP;
 
-    if (!os_start_enable)
-        return;
+    SP = origin_sp; //这里使用原始栈，为了不破快任务栈
+    os_tick++;      //tick自增
 
-    OS_TaskMark();
-    
-
+    //任务调度切换
+    if (os_start_enable)
+    {
+        os_time--;
+        if (os_time == 0)
+        {
+            os_time = OS_TIME;
+            OS_Task_SW();
+        }
+    }
+    //SP还原/切换
+    if (running_task != NULL)
+    {
+        running_task->timer++;
+        origin_sp = SP;
+        SP = running_task->stack->sp;
+    }
+    //==弹栈==
 }
 
 /*
@@ -58,19 +79,19 @@ void T0_ISR() interrupt 1 using 1
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void OS_TIMER_Init(void)
+void OS_TIMER_Init(void) large
 {
     os_tick = 0ul;
-    os_start_enable = 0;
+    os_time = OS_TIME;
 
     AUXR |= 0x80;   //定时器0为1T模式
     TMOD &= ~0x0F;  //定时器0模式0：16位自动重载
     TL0 = T_1MS;     
     TH0 = T_1MS >> 8;
-    ET0 = 1;        //使能定时器中断
+    // ET0 = 1;        //使能定时器中断
     EA = 1;         //开总中断
     
-    TR0 = 1;        //启动定时器
+    // TR0 = 1;        //启动定时器
 }
 
 /*

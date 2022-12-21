@@ -1,5 +1,7 @@
 ".\Objects\STARTUP.obj",
 ".\Objects\main.obj",
+".\Objects\bsp.obj",
+".\Objects\bsp_uart.obj",
 ".\Objects\lib_delay.obj",
 ".\Objects\os.obj",
 ".\Objects\os_timer.obj" 

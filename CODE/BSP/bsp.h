@@ -24,8 +24,6 @@
 
 #include "lib_delay.h"
 #include "lib_stdint.h"
-// #include "lib_str.h"
-#include "lib_math.h"
 
 
 
@@ -35,13 +33,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp_seg.h"
-#include "bsp_kbd.h"
-#include "bsp_buzzer.h"
-#include "bsp_welder.h"
 #include "bsp_uart.h"
-#include "bsp_eeprom.h"
-#include "bsp_power.h"
 
 
 

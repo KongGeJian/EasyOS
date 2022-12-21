@@ -32,6 +32,9 @@
 extern volatile u32 data os_tick;   //系统计时器，无符号32位(4字节)
 extern volatile bit data os_start_enable;   //启动标识
 
+extern u8 xdata origin_sp; //原始栈指针
+
+
 
 /*
 *********************************************************************************************************
@@ -39,7 +42,7 @@ extern volatile bit data os_start_enable;   //启动标识
 *********************************************************************************************************
 */
 
-extern void OS_TIMER_Init(void);
+extern void OS_TIMER_Init(void) large;
 
 extern u16  OS_TIMER_GetUs(void);
 

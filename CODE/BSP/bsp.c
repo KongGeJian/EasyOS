@@ -33,13 +33,7 @@ void BSP_Init(void) large
     EA = 1;             // 使能总中断。
 
     // 初始化
-    BSP_SEG_Init();
-    BSP_KBD_Init();
-    BSP_BUZZER_Init();
-    BSP_WELDER_Init();
-    BSP_EEPROM_Init();
     BSP_UART_Init();
-    BSP_POWER_Init();
 }
 
 /**********************************************END******************************************************/
