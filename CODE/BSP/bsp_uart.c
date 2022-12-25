@@ -63,9 +63,9 @@ volatile byte pdata u2_r_data;
 //串口1读取的奇偶校验位，外部使用声明即可: extern bit  xdata u2_r_parity;
 volatile byte pdata u2_r_parity;
 
-
 //字符串buf
-static const char xdata strbuf[STRBUF_LEN];
+// static const char xdata strbuf[STRBUF_LEN];
+
 
 
 /*
@@ -75,7 +75,7 @@ static const char xdata strbuf[STRBUF_LEN];
 */
 
 /*串口1发送字节*/
-static void UART1_SendByte(byte dat) compact reentrant
+static void _UART1_SendByte(byte dat) compact reentrant
 {
 #if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
@@ -102,7 +102,7 @@ static void UART1_SendByte(byte dat) compact reentrant
 }
 
 /*串口2发送字节*/
-static void UART2_SendByte(byte dat) compact reentrant
+static void _UART2_SendByte(byte dat) compact reentrant
 {
 #if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
@@ -201,7 +201,7 @@ void BSP_UART_Init(void) large
 
     ES = 1;                 //使能UART1中断
     IE2 |= 0x01;            //使能UART2中断
-    EA = 1;                 //断开主中断开关，其他地方已经打开
+    EA = 1;                 //开主中断开关，其他地方已经打开
 
     busy = 0;
 }
@@ -213,61 +213,73 @@ void BSP_UART_Init(void) large
 * Argument(s) : UART - 串口枚举 UART1/UART2
 *               dat - 要发送的数据
 *
-* Return(s)   : none.
-*
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void BSP_UART_SendByte(UART_E_TYP UART, byte dat) large reentrant
+void BSP_UART_SendByte(UART_E_TYP UART, byte dat) compact reentrant
 {
     if (UART == UART1)
-        UART1_SendByte(dat);
+        _UART1_SendByte(dat);
     else
-        UART2_SendByte(dat);
+        _UART2_SendByte(dat);
 }
 
 /*
 *********************************************************************************************************
 * Description : 将字符串发送到UART
 *
-* Argument(s) : UART - 串口枚举 UART1/UART2
+* Argument(s) : uart - 串口枚举，参考 UART_E_TYP
 *               *s - 字符串地址
-*
-* Return(s)   : none.
 *
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void BSP_UART_SendString(UART_E_TYP UART, char *s) large reentrant
+void BSP_UART_SendString(UART_E_TYP uart, const char *s) compact reentrant
 {
-    if (UART == UART1)
+    if (uart == UART1)
         while (*s)                //检查字符串的结尾
-            UART1_SendByte(*s++); //发送当前字符，后自增字符串地址指针
+            _UART1_SendByte(*s++);//发送当前字符，后自增字符串地址指针
     else
         while (*s)                //检查字符串的结尾
-            UART2_SendByte(*s++); //发送当前字符，后自增字符串地址指针
+            _UART2_SendByte(*s++);//发送当前字符，后自增字符串地址指针
 }
 
 /*
 *********************************************************************************************************
 * Description : 串口打印行
 *
-* Argument(s) : UART - 串口枚举 UART1/UART2
-*               *s - 字符串地址
+* Argument(s) : uart - 串口枚举，参考 UART_E_TYP
+*               *format - 字符串format
 *
 * Return(s)   : none.
 *********************************************************************************************************
 */
-void BSP_UART_Println(UART_E_TYP UART, const char *format, ...) large reentrant
+void BSP_UART_Println(UART_E_TYP uart, const char *format, ...) compact reentrant
 {
+    const char xdata *strbuf;
     va_list aptr;
+    int16_t len;
+
+    strbuf = calloc(STRBUF_LEN, sizeof(char));
+    if (strbuf == NULL)
+    {
+        BSP_UART_SendString(uart, "Not enough memory space for STRBUF_LEN.\n");
+        while (1);
+    }
 
     va_start(aptr, format);
-    vsprintf(strbuf, format, aptr);
+    len = vsprintf(strbuf, format, aptr);
     va_end(aptr);
+    if (len < 0 || len >= STRBUF_LEN)
+    {
+        BSP_UART_SendString(uart, "STRBUF_LEN too small.\n");
+        while (1);
+    }
 
-    BSP_UART_SendString(UART, strbuf);
-    BSP_UART_SendByte(UART, '\n');
+    BSP_UART_SendString(uart, strbuf);
+    BSP_UART_SendByte(uart, '\n');
+
+    free(strbuf);
 }
 
 /**********************************************RND******************************************************/

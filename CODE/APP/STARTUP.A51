@@ -74,7 +74,7 @@ XBPSTACKTOP     EQU     0xFFFF +1   ; default 0FFFFH+1
 ; <h> Stack Space for reentrant functions in the COMPACT model.    
 ;  <q> PBPSTACK: Enable COMPACT model reentrant stack
 ;     <i> Stack space for reentrant functions in the COMPACT model.
-PBPSTACK        EQU     0       ; set to 1 if compact reentrant is used.
+PBPSTACK        EQU     1       ; set to 1 if compact reentrant is used.
 ;
 ;   <o> PBPSTACKTOP: End address of COMPACT model stack <0x0-0xFFFF>
 ;     <i> Set the top of the stack to the highest location.

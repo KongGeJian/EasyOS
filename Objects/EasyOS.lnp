@@ -3,8 +3,10 @@
 ".\Objects\bsp.obj",
 ".\Objects\bsp_uart.obj",
 ".\Objects\lib_delay.obj",
+".\Objects\lib_mem.obj",
 ".\Objects\os.obj",
-".\Objects\os_timer.obj" 
+".\Objects\os_timer.obj",
+".\Objects\os_core.obj" 
 TO ".\Objects\EasyOS" 
 
 PRINT(".\Listings\EasyOS.map") IXREF 

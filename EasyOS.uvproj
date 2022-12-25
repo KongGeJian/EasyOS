@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <IncludePath>C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS</IncludePath>
             </VariousControls>
           </Ax51>
           <Lx51>
@@ -436,6 +436,16 @@
               <FileType>5</FileType>
               <FilePath>.\CODE\EXT-LIB\lib_stdint.h</FilePath>
             </File>
+            <File>
+              <FileName>lib_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CODE\EXT-LIB\lib_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>lib_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CODE\EXT-LIB\lib_mem.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -501,6 +511,11 @@
               <FileName>os_timer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CODE\OS\os_timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>os_core.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\CODE\OS\os_core.asm</FilePath>
             </File>
           </Files>
         </Group>

@@ -32,7 +32,11 @@ void BSP_Init(void) large
     AUXR |= 0x80;       // 定时器T0设置为1T（为兼容传统8051，默认12T）
     EA = 1;             // 使能总中断。
 
-    // 初始化
+    //初始化 LIB
+    delay_init();
+    mem_init();
+
+    //初始化 BSP
     BSP_UART_Init();
 }
 

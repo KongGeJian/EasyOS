@@ -1,4 +1,4 @@
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     1
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     1
 
 
 MACRO ASSEMBLER AX51 V3.15.3.0
@@ -65,7 +65,7 @@ LOC    OBJ             LINE     SOURCE
  00EA                    54     CCAP0L  DATA    0EAH
  00D8.6                  55     CR      BIT     0D8H.6
  00AE                    56     TA      DATA    0AEH
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     2
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     2
 
  00EB                    57     CCAP1L  DATA    0EBH
  00DA                    58     CCAPM0  DATA    0DAH
@@ -133,7 +133,7 @@ LOC    OBJ             LINE     SOURCE
  00F8.0                 120     P70     BIT     0F8H.0
  00E8.1                 121     P61     BIT     0E8H.1
  00C8.2                 122     P52     BIT     0C8H.2
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     3
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     3
 
  00C0.3                 123     P43     BIT     0C0H.3
  00B8.6                 124     PLVD    BIT     0B8H.6
@@ -201,7 +201,7 @@ LOC    OBJ             LINE     SOURCE
  008B                   186     TL1     DATA    08BH
  00D7                   187     T2L     DATA    0D7H
  0098.5                 188     SM2     BIT     098H.5
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     4
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     4
 
  00D5                   189     T3L     DATA    0D5H
  00D3                   190     T4L     DATA    0D3H
@@ -246,481 +246,224 @@ LOC    OBJ             LINE     SOURCE
  00D8.1                 229     CCF1    BIT     0D8H.1
  00CF                   230     SPDAT   DATA    0CFH
  0094                   231     P0M0    DATA    094H
-------                  232     ?PR?T0_ISR?OS_TIMER  SEGMENT CODE 
-------                  233     ?PR?OS_TIMER_Init?OS_TIMER               SEGMENT CODE 
-------                  234     ?PR?OS_TIMER_GetUs?OS_TIMER              SEGMENT CODE 
-------                  235     ?ID?OS_TIMER_GetUs?OS_TIMER              SEGMENT IDATA 
-------                  236     ?BI?OS_TIMER         SEGMENT BIT 
-------                  237     ?XD?OS_TIMER         SEGMENT XDATA 
-------                  238     ?DT?OS_TIMER         SEGMENT DATA 
-                        239             EXTRN   XDATA (running_task)
-                        240             EXTRN   CODE (OS_Task_SW)
-                        241             EXTRN   CODE (?C?LSTXDATA)
-                        242             EXTRN   CODE (?C?UIDIV)
-                        243             PUBLIC  os_time
-                        244             PUBLIC  os_tick
-                        245             PUBLIC  origin_sp
-                        246             PUBLIC  os_start_enable
-                        247             PUBLIC  OS_TIMER_GetUs
-                        248             PUBLIC  OS_TIMER_Init
-                        249             PUBLIC  T0_ISR
-                        250     
-------                  251             RSEG  ?ID?OS_TIMER_GetUs?OS_TIMER
-000000                  252            tmp1?240:   DS   2
-                        253     
-------                  254             RSEG  ?ID?OS_TIMER_GetUs?OS_TIMER
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     5
+------                  232     ?PR?OS_TIMER_Init?OS_TIMER               SEGMENT CODE 
+------                  233     ?PR?OS_TIMER_GetUs?OS_TIMER              SEGMENT CODE 
+------                  234     ?ID?OS_TIMER_GetUs?OS_TIMER              SEGMENT IDATA 
+------                  235     ?XD?OS_TIMER         SEGMENT XDATA 
+------                  236     ?DT?OS_TIMER         SEGMENT DATA 
+                        237             EXTRN   CODE (?C?UIDIV)
+                        238             PUBLIC  os_tick
+                        239             PUBLIC  origin_sp
+                        240             PUBLIC  OS_TIMER_GetUs
+                        241             PUBLIC  OS_TIMER_Init
+                        242     
+------                  243             RSEG  ?ID?OS_TIMER_GetUs?OS_TIMER
+000000                  244            tmp1?140:   DS   2
+                        245     
+------                  246             RSEG  ?ID?OS_TIMER_GetUs?OS_TIMER
+000002                  247            tmp2?141:   DS   2
+                        248     
+------                  249             RSEG  ?XD?OS_TIMER
+000000                  250           origin_sp:   DS   1
+                        251     
+------                  252             RSEG  ?DT?OS_TIMER
+000000                  253             os_tick:   DS   4
+                        254     ; /*
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     5
 
-000002                  255            tmp2?241:   DS   2
-                        256     
-------                  257             RSEG  ?BI?OS_TIMER
-0000.0                  258     os_start_enable:   DBIT   1
-                        259     
-------                  260             RSEG  ?XD?OS_TIMER
-000000                  261           origin_sp:   DS   1
-                        262     
-------                  263             RSEG  ?DT?OS_TIMER
-000000                  264             os_tick:   DS   4
-000004                  265             os_time:   DS   1
-                        266     ; /*
-                        267     ; **************************************************************************************
+                        255     ; **************************************************************************************
                                *******************
-                        268     ; *                                      OPERATING SYSTEM PACKAGE
-                        269     ; *
-                        270     ; * Name    : 系统计时器
-                        271     ; * Version : V1.0
-                        272     ; * Author  : 空格键
-                        273     ; * ----------------------------
-                        274     ; * Note(s) : 使用T0定时器，1ms产生一个中断。使用无符号32位计时，�
+                        256     ; *                                      OPERATING SYSTEM PACKAGE
+                        257     ; *
+                        258     ; * Name    : 系统计时器
+                        259     ; * Version : V1.0
+                        260     ; * Author  : 空格键
+                        261     ; * ----------------------------
+                        262     ; * Note(s) : 使用T0定时器，1ms产生一个中断。使用无符号32位计时，�
                                ��大可以可运行45.7天溢出。
-                        275     ; * Tip(s)  : 如果要提高时间精度，或者增大运行天数，可使用结构�
+                        263     ; * Tip(s)  : 如果要提高时间精度，或者增大运行天数，可使用结构�
                                �，{中断计数，计数溢出计数}
-                        276     ; **************************************************************************************
+                        264     ; **************************************************************************************
                                *******************
-                        277     ; */
-                        278     ; 
-                        279     ; #include "os_timer.h"
+                        265     ; */
+                        266     ; 
+                        267     ; #include "os_timer.h"
+                        268     ; 
+                        269     ; 
+                        270     ; 
+                        271     ; /*
+                        272     ; **************************************************************************************
+                               *******************
+                        273     ; *                                               DEFINE
+                        274     ; **************************************************************************************
+                               *******************
+                        275     ; */
+                        276     ; 
+                        277     ; #define T_1MS (65536-SYSclk/1000)   //1ms timer 重载值
+                        278     ; #define T_1US_CNT (SYSclk/1000000)  //1us所属个数
+                        279     ; 
                         280     ; 
-                        281     ; 
+                        281     ; volatile u32 data os_tick;  //系统计时器，无符号32位(4字节)
                         282     ; 
-                        283     ; /*
-                        284     ; **************************************************************************************
+                        283     ; u8 xdata origin_sp; //原始栈指针
+                        284     ; 
+                        285     ; 
+                        286     ; 
+                        287     ; /*
+                        288     ; **************************************************************************************
                                *******************
-                        285     ; *                                               DEFINE
-                        286     ; **************************************************************************************
+                        289     ; *                                             INTERRUPT
+                        290     ; **************************************************************************************
                                *******************
-                        287     ; */
-                        288     ; 
-                        289     ; #define T_1MS (65536-SYSclk/1000)   //1ms timer 重载值
-                        290     ; #define T_1US_CNT (SYSclk/1000000)  //1us所属个数
-                        291     ; 
+                        291     ; */
                         292     ; 
-                        293     ; volatile u32 data os_tick;  //系统计时器，无符号32位(4字节)
-                        294     ; volatile bit data os_start_enable; //启动标识
-                        295     ; volatile u8 data os_time;
-                        296     ; 
-                        297     ; u8 xdata origin_sp; //原始栈指针
-                        298     ; 
-                        299     ; 
+                        293     ; /*T0中断服务程序*/      //ASM实现
+                        294     ; // void T0_ISR() interrupt 1
+                        295     ; // {
+                        296     ; //     //==压栈==
+                        297     ; //     //记录当前任务栈顶
+                        298     ; //     if (running_task != NULL)
+                        299     ; //         running_task->stack->sp = (uint8_t idata *)SP;
                         300     ; 
-                        301     ; /*
-                        302     ; **************************************************************************************
-                               *******************
-                        303     ; *                                             INTERRUPT
-                        304     ; **************************************************************************************
-                               *******************
-                        305     ; */
-                        306     ; 
-                        307     ; /*T0中断服务程序*/ //TODO后面用ASM实现
-00000B                  308     CSEG    AT      0000BH
-00000B 020000     F     309             LJMP    T0_ISR
-                        310     
-                        311     ; void T0_ISR() interrupt 1
-                        312     
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     6
+                        301     ; //     SP = origin_sp; //这里使用原始栈，为了不破快任务栈
+                        302     ; //     os_tick++;      //tick自增
+                        303     ; 
+                        304     ; //     //任务调度切换
+                        305     ; //     OS_TaskMark();
+                        306     ; //     OS_TaskSwitch();
+                        307     ; //     //SP还原/切换
+                        308     ; //     if (running_task != NULL)
+                        309     ; //     {
+                        310     ; //         origin_sp = SP;
+                        311     ; //         SP = running_task->stack->sp;
+                        312     ; //     }
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     6
 
-------                  313             RSEG  ?PR?T0_ISR?OS_TIMER
-                        314             USING   0
-000000                  315     T0_ISR:
-000000 C0E0             316             PUSH    ACC
-000002 C0F0             317             PUSH    B
-000004 C083             318             PUSH    DPH
-000006 C082             319             PUSH    DPL
-000008 C0D0             320             PUSH    PSW
-00000A 75D000           321             MOV     PSW,#00H
-00000D C000             322             PUSH    AR0
-00000F C001             323             PUSH    AR1
-000011 C002             324             PUSH    AR2
-000013 C003             325             PUSH    AR3
-000015 C004             326             PUSH    AR4
-000017 C005             327             PUSH    AR5
-000019 C006             328             PUSH    AR6
-00001B C007             329             PUSH    AR7
-                        330             USING   0
-                        331                             ; SOURCE LINE # 43
-                        332     ; {
-                        333     ;     //==压栈==
-                        334     ;     //记录当前任务栈顶
-                        335     ;     if (running_task != NULL)
-                        336                             ; SOURCE LINE # 47
-00001D 900000     E     337             MOV     DPTR,#running_task
-000020 E0               338             MOVX    A,@DPTR
-000021 FE               339             MOV     R6,A
-000022 A3               340             INC     DPTR
-000023 E0               341             MOVX    A,@DPTR
-000024 FF               342             MOV     R7,A
-000025 EF               343             MOV     A,R7
-000026 4E               344             ORL     A,R6
-000027 6027             345             JZ      ?C0001
-                        346     ;         running_task->stack->sp = (uint8_t idata *)SP;
-                        347                             ; SOURCE LINE # 48
-000029 AF81             348             MOV     R7,SP
-00002B 900000     E     349             MOV     DPTR,#running_task
-00002E E0               350             MOVX    A,@DPTR
-00002F FC               351             MOV     R4,A
-000030 A3               352             INC     DPTR
-000031 E0               353             MOVX    A,@DPTR
-000032 FD               354             MOV     R5,A
-000033 8D82             355             MOV     DPL,R5
-000035 8C83             356             MOV     DPH,R4
-000037 E582             357             MOV     A,DPL
-000039 240A             358             ADD     A,#0AH
-00003B F582             359             MOV     DPL,A
-00003D E583             360             MOV     A,DPH
-00003F 3400             361             ADDC    A,#00H
-000041 F583             362             MOV     DPH,A
-000043 E0               363             MOVX    A,@DPTR
-000044 FC               364             MOV     R4,A
-000045 A3               365             INC     DPTR
-000046 E0               366             MOVX    A,@DPTR
-000047 FD               367             MOV     R5,A
-000048 8D82             368             MOV     DPL,R5
-00004A 8C83             369             MOV     DPH,R4
-00004C A3               370             INC     DPTR
-00004D A3               371             INC     DPTR
-00004E EF               372             MOV     A,R7
-00004F F0               373             MOVX    @DPTR,A
-000050                  374     ?C0001:
-                        375     ; 
-                        376     ;     SP = origin_sp; //这里使用原始栈，为了不破快任务栈
-                        377                             ; SOURCE LINE # 50
-000050 900000     F     378             MOV     DPTR,#origin_sp
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     7
-
-000053 E0               379             MOVX    A,@DPTR
-000054 FF               380             MOV     R7,A
-000055 8F81             381             MOV     SP,R7
-                        382     ;     os_tick++;      //tick自增
-                        383                             ; SOURCE LINE # 51
-000057 AF00       F     384             MOV     R7,os_tick+03H
-000059 AE00       F     385             MOV     R6,os_tick+02H
-00005B AD00       F     386             MOV     R5,os_tick+01H
-00005D AC00       F     387             MOV     R4,os_tick
-00005F 7B01             388             MOV     R3,#01H
-000061 7A00             389             MOV     R2,#00H
-000063 7900             390             MOV     R1,#00H
-000065 7800             391             MOV     R0,#00H
-000067 EF               392             MOV     A,R7
-000068 2B               393             ADD     A,R3
-000069 F500       F     394             MOV     os_tick+03H,A
-00006B EE               395             MOV     A,R6
-00006C 3A               396             ADDC    A,R2
-00006D F500       F     397             MOV     os_tick+02H,A
-00006F ED               398             MOV     A,R5
-000070 39               399             ADDC    A,R1
-000071 F500       F     400             MOV     os_tick+01H,A
-000073 EC               401             MOV     A,R4
-000074 38               402             ADDC    A,R0
-000075 F500       F     403             MOV     os_tick,A
-                        404     ; 
-                        405     ;     //任务调度切换
-                        406     ;     if (os_start_enable)
-                        407                             ; SOURCE LINE # 54
-000077 300010           408             JNB     os_start_enable,?C0002
-                        409     ;     {
-                        410                             ; SOURCE LINE # 55
-                        411     ;         os_time--;
-                        412                             ; SOURCE LINE # 56
-00007A 1500       F     413             DEC     os_time
-                        414     ;         if (os_time == 0)
-                        415                             ; SOURCE LINE # 57
-00007C AF00       F     416             MOV     R7,os_time
-00007E 7E00             417             MOV     R6,#00H
-000080 EF               418             MOV     A,R7
-000081 4E               419             ORL     A,R6
-000082 7006             420             JNZ     ?C0002
-                        421     ;         {
-                        422                             ; SOURCE LINE # 58
-                        423     ;             os_time = OS_TIME;
-                        424                             ; SOURCE LINE # 59
-000084 75000A     F     425             MOV     os_time,#0AH
-                        426     ;             OS_Task_SW();
-                        427                             ; SOURCE LINE # 60
-000087 120000     E     428             LCALL   OS_Task_SW
-                        429     ;         }
-                        430                             ; SOURCE LINE # 61
-                        431     ;     }
-                        432                             ; SOURCE LINE # 62
-00008A                  433     ?C0002:
-                        434     ;     //SP还原/切换
-                        435     ;     if (running_task != NULL)
-                        436                             ; SOURCE LINE # 64
-00008A 900000     E     437             MOV     DPTR,#running_task
-00008D E0               438             MOVX    A,@DPTR
-00008E FE               439             MOV     R6,A
-00008F A3               440             INC     DPTR
-000090 E0               441             MOVX    A,@DPTR
-000091 FF               442             MOV     R7,A
-000092 EF               443             MOV     A,R7
-000093 4E               444             ORL     A,R6
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     8
-
-000094 607F             445             JZ      ?C0005
-                        446     ;     {
-                        447                             ; SOURCE LINE # 65
-                        448     ;         running_task->timer++;
-                        449                             ; SOURCE LINE # 66
-000096 900000     E     450             MOV     DPTR,#running_task
-000099 E0               451             MOVX    A,@DPTR
-00009A FE               452             MOV     R6,A
-00009B A3               453             INC     DPTR
-00009C E0               454             MOVX    A,@DPTR
-00009D FF               455             MOV     R7,A
-00009E 8F82             456             MOV     DPL,R7
-0000A0 8E83             457             MOV     DPH,R6
-0000A2 E582             458             MOV     A,DPL
-0000A4 2406             459             ADD     A,#06H
-0000A6 F582             460             MOV     DPL,A
-0000A8 E583             461             MOV     A,DPH
-0000AA 3400             462             ADDC    A,#00H
-0000AC F583             463             MOV     DPH,A
-0000AE E0               464             MOVX    A,@DPTR
-0000AF FC               465             MOV     R4,A
-0000B0 A3               466             INC     DPTR
-0000B1 E0               467             MOVX    A,@DPTR
-0000B2 FD               468             MOV     R5,A
-0000B3 A3               469             INC     DPTR
-0000B4 E0               470             MOVX    A,@DPTR
-0000B5 FE               471             MOV     R6,A
-0000B6 A3               472             INC     DPTR
-0000B7 E0               473             MOVX    A,@DPTR
-0000B8 FF               474             MOV     R7,A
-0000B9 7B01             475             MOV     R3,#01H
-0000BB 7A00             476             MOV     R2,#00H
-0000BD 7900             477             MOV     R1,#00H
-0000BF 7800             478             MOV     R0,#00H
-0000C1 EF               479             MOV     A,R7
-0000C2 2B               480             ADD     A,R3
-0000C3 FF               481             MOV     R7,A
-0000C4 EE               482             MOV     A,R6
-0000C5 3A               483             ADDC    A,R2
-0000C6 FE               484             MOV     R6,A
-0000C7 ED               485             MOV     A,R5
-0000C8 39               486             ADDC    A,R1
-0000C9 FD               487             MOV     R5,A
-0000CA EC               488             MOV     A,R4
-0000CB 38               489             ADDC    A,R0
-0000CC FC               490             MOV     R4,A
-0000CD 900000     E     491             MOV     DPTR,#running_task
-0000D0 E0               492             MOVX    A,@DPTR
-0000D1 FA               493             MOV     R2,A
-0000D2 A3               494             INC     DPTR
-0000D3 E0               495             MOVX    A,@DPTR
-0000D4 FB               496             MOV     R3,A
-0000D5 8B82             497             MOV     DPL,R3
-0000D7 8A83             498             MOV     DPH,R2
-0000D9 E582             499             MOV     A,DPL
-0000DB 2406             500             ADD     A,#06H
-0000DD F582             501             MOV     DPL,A
-0000DF E583             502             MOV     A,DPH
-0000E1 3400             503             ADDC    A,#00H
-0000E3 F583             504             MOV     DPH,A
-0000E5 120000     E     505             LCALL   ?C?LSTXDATA
-                        506     ;         origin_sp = SP;
-                        507                             ; SOURCE LINE # 67
-0000E8 900000     F     508             MOV     DPTR,#origin_sp
-0000EB E581             509             MOV     A,SP
-0000ED F0               510             MOVX    @DPTR,A
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE     9
-
-                        511     ;         SP = running_task->stack->sp;
-                        512                             ; SOURCE LINE # 68
-0000EE 900000     E     513             MOV     DPTR,#running_task
-0000F1 E0               514             MOVX    A,@DPTR
-0000F2 FE               515             MOV     R6,A
-0000F3 A3               516             INC     DPTR
-0000F4 E0               517             MOVX    A,@DPTR
-0000F5 FF               518             MOV     R7,A
-0000F6 8F82             519             MOV     DPL,R7
-0000F8 8E83             520             MOV     DPH,R6
-0000FA E582             521             MOV     A,DPL
-0000FC 240A             522             ADD     A,#0AH
-0000FE F582             523             MOV     DPL,A
-000100 E583             524             MOV     A,DPH
-000102 3400             525             ADDC    A,#00H
-000104 F583             526             MOV     DPH,A
-000106 E0               527             MOVX    A,@DPTR
-000107 FE               528             MOV     R6,A
-000108 A3               529             INC     DPTR
-000109 E0               530             MOVX    A,@DPTR
-00010A FF               531             MOV     R7,A
-00010B 8F82             532             MOV     DPL,R7
-00010D 8E83             533             MOV     DPH,R6
-00010F A3               534             INC     DPTR
-000110 A3               535             INC     DPTR
-000111 E0               536             MOVX    A,@DPTR
-000112 FF               537             MOV     R7,A
-000113 8F81             538             MOV     SP,R7
-                        539     ;     }
-                        540                             ; SOURCE LINE # 69
-                        541     ;     //==弹栈==
-                        542     ; }
-                        543                             ; SOURCE LINE # 71
-000115                  544     ?C0005:
-000115 D007             545             POP     AR7
-000117 D006             546             POP     AR6
-000119 D005             547             POP     AR5
-00011B D004             548             POP     AR4
-00011D D003             549             POP     AR3
-00011F D002             550             POP     AR2
-000121 D001             551             POP     AR1
-000123 D000             552             POP     AR0
-000125 D0D0             553             POP     PSW
-000127 D082             554             POP     DPL
-000129 D083             555             POP     DPH
-00012B D0F0             556             POP     B
-00012D D0E0             557             POP     ACC
-00012F 32               558             RETI    
-                        559     ; END OF T0_ISR
-                        560     
-                        561     ; 
-                        562     ; /*
-                        563     ; **************************************************************************************
+                        313     ; //     //==弹栈==
+                        314     ; // }
+                        315     ; 
+                        316     ; /*
+                        317     ; **************************************************************************************
                                *******************
-                        564     ; * Description : 系统计时器初始化
-                        565     ; *
-                        566     ; * Caller(s)   : OS_Init()
-                        567     ; *
-                        568     ; * Note(s)     : none.
-                        569     ; **************************************************************************************
+                        318     ; * Description : 系统计时器初始化
+                        319     ; *
+                        320     ; * Caller(s)   : OS_Init()
+                        321     ; *
+                        322     ; * Note(s)     : none.
+                        323     ; **************************************************************************************
                                *******************
-                        570     ; */
-                        571     ; void OS_TIMER_Init(void) large
-                        572     
-------                  573             RSEG  ?PR?OS_TIMER_Init?OS_TIMER
-000000                  574     OS_TIMER_Init:
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    10
+                        324     ; */
+                        325     ; void OS_TIMER_Init(void) large
+                        326     
+------                  327             RSEG  ?PR?OS_TIMER_Init?OS_TIMER
+000000                  328     OS_TIMER_Init:
+                        329             USING   0
+                        330                             ; SOURCE LINE # 72
+                        331     ; {
+                        332     ;     os_tick = 0ul;
+                        333                             ; SOURCE LINE # 74
+000000 750000     F     334             MOV     os_tick+03H,#00H
+000003 750000     F     335             MOV     os_tick+02H,#00H
+000006 750000     F     336             MOV     os_tick+01H,#00H
+000009 750000     F     337             MOV     os_tick,#00H
+                        338     ; 
+                        339     ;     AUXR |= 0x80;   //定时器0为1T模式
+                        340                             ; SOURCE LINE # 76
+00000C 438E80           341             ORL     AUXR,#080H
+                        342     ;     TMOD &= ~0x0F;  //定时器0模式0：16位自动重载
+                        343                             ; SOURCE LINE # 77
+00000F 5389F0           344             ANL     TMOD,#0F0H
+                        345     ;     TL0 = T_1MS;     
+                        346                             ; SOURCE LINE # 78
+000012 758A20           347             MOV     TL0,#020H
+                        348     ;     TH0 = T_1MS >> 8;
+                        349                             ; SOURCE LINE # 79
+000015 758CD1           350             MOV     TH0,#0D1H
+                        351     ;     // ET0 = 1;        //使能定时器中断
+                        352     ;     EA = 1;         //开总中断
+                        353                             ; SOURCE LINE # 81
+000018 D2AF             354             SETB    EA
+                        355     ;     
+                        356     ;     // TR0 = 1;        //启动定时器
+                        357     ; }
+                        358                             ; SOURCE LINE # 84
+00001A 22               359             RET     
+                        360     ; END OF OS_TIMER_Init
+                        361     
+                        362     ; 
+                        363     ; /*
+                        364     ; **************************************************************************************
+                               *******************
+                        365     ; * Description : 获取系统计时器微秒数
+                        366     ; *
+                        367     ; * Return(s)   : 返回计时器微秒部分，取值[0,999]
+                        368     ; *
+                        369     ; * Note(s)     : none.
+                        370     ; **************************************************************************************
+                               *******************
+                        371     ; */
+                        372     ; u16 OS_TIMER_GetUs(void)
+                        373     
+------                  374             RSEG  ?PR?OS_TIMER_GetUs?OS_TIMER
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     7
 
-                        575             USING   0
-                        576                             ; SOURCE LINE # 82
-                        577     ; {
-                        578     ;     os_tick = 0ul;
-                        579                             ; SOURCE LINE # 84
-000000 750000     F     580             MOV     os_tick+03H,#00H
-000003 750000     F     581             MOV     os_tick+02H,#00H
-000006 750000     F     582             MOV     os_tick+01H,#00H
-000009 750000     F     583             MOV     os_tick,#00H
-                        584     ;     os_time = 1;
-                        585                             ; SOURCE LINE # 85
-00000C 750001     F     586             MOV     os_time,#01H
-                        587     ; 
-                        588     ;     AUXR |= 0x80;   //定时器0为1T模式
-                        589                             ; SOURCE LINE # 87
-00000F 438E80           590             ORL     AUXR,#080H
-                        591     ;     TMOD &= ~0x0F;  //定时器0模式0：16位自动重载
-                        592                             ; SOURCE LINE # 88
-000012 5389F0           593             ANL     TMOD,#0F0H
-                        594     ;     TL0 = T_1MS;     
-                        595                             ; SOURCE LINE # 89
-000015 758A20           596             MOV     TL0,#020H
-                        597     ;     TH0 = T_1MS >> 8;
-                        598                             ; SOURCE LINE # 90
-000018 758CD1           599             MOV     TH0,#0D1H
-                        600     ;     // ET0 = 1;        //使能定时器中断
-                        601     ;     EA = 1;         //开总中断
-                        602                             ; SOURCE LINE # 92
-00001B D2AF             603             SETB    EA
-                        604     ;     
-                        605     ;     // TR0 = 1;        //启动定时器
-                        606     ; }
-                        607                             ; SOURCE LINE # 95
-00001D 22               608             RET     
-                        609     ; END OF OS_TIMER_Init
-                        610     
-                        611     ; 
-                        612     ; /*
-                        613     ; **************************************************************************************
-                               *******************
-                        614     ; * Description : 获取系统计时器微秒数
-                        615     ; *
-                        616     ; * Return(s)   : 返回计时器微秒部分，取值[0,999]
-                        617     ; *
-                        618     ; * Note(s)     : none.
-                        619     ; **************************************************************************************
-                               *******************
-                        620     ; */
-                        621     ; u16 OS_TIMER_GetUs(void)
-                        622     
-------                  623             RSEG  ?PR?OS_TIMER_GetUs?OS_TIMER
-000000                  624     OS_TIMER_GetUs:
-                        625             USING   0
-                        626                             ; SOURCE LINE # 106
-                        627     ; {
-                        628                             ; SOURCE LINE # 107
-                        629     ;     u16 idata tmp1 = T_1MS, tmp2 = T_1US_CNT;
-                        630                             ; SOURCE LINE # 108
-000000 7800       F     631             MOV     R0,#LOW (tmp1?240)
-000002 76D1             632             MOV     @R0,#0D1H
-000004 08               633             INC     R0
-000005 7620             634             MOV     @R0,#020H
-000007 7800       F     635             MOV     R0,#LOW (tmp2?241)
-000009 7600             636             MOV     @R0,#00H
-00000B 08               637             INC     R0
-00000C 760C             638             MOV     @R0,#0CH
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    11
-
-                        639     ;     return ((TH0 << 8 | TL0) - tmp1) / tmp2;
-                        640                             ; SOURCE LINE # 109
-00000E AF8C             641             MOV     R7,TH0
-000010 7E00             642             MOV     R6,#00H
-000012 EF               643             MOV     A,R7
-000013 7F00             644             MOV     R7,#00H
-000015 FE               645             MOV     R6,A
-000016 AD8A             646             MOV     R5,TL0
-000018 7C00             647             MOV     R4,#00H
-00001A EE               648             MOV     A,R6
-00001B 4C               649             ORL     A,R4
-00001C FE               650             MOV     R6,A
-00001D EF               651             MOV     A,R7
-00001E 4D               652             ORL     A,R5
-00001F FF               653             MOV     R7,A
-000020 7800       F     654             MOV     R0,#LOW (tmp1?240)
-000022 E6               655             MOV     A,@R0
-000023 FC               656             MOV     R4,A
-000024 08               657             INC     R0
-000025 E6               658             MOV     A,@R0
-000026 FD               659             MOV     R5,A
-000027 C3               660             CLR     C
-000028 EF               661             MOV     A,R7
-000029 9D               662             SUBB    A,R5
-00002A FF               663             MOV     R7,A
-00002B EE               664             MOV     A,R6
-00002C 9C               665             SUBB    A,R4
-00002D FE               666             MOV     R6,A
-00002E 7800       F     667             MOV     R0,#LOW (tmp2?241)
-000030 E6               668             MOV     A,@R0
-000031 FC               669             MOV     R4,A
-000032 08               670             INC     R0
-000033 E6               671             MOV     A,@R0
-000034 FD               672             MOV     R5,A
-000035 120000     E     673             LCALL   ?C?UIDIV
-                        674     ; }
-                        675                             ; SOURCE LINE # 110
-000038 22               676             RET     
-                        677     ; END OF OS_TIMER_GetUs
-                        678     
-                        679             END
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    12
+000000                  375     OS_TIMER_GetUs:
+                        376             USING   0
+                        377                             ; SOURCE LINE # 95
+                        378     ; {
+                        379                             ; SOURCE LINE # 96
+                        380     ;     u16 idata tmp1 = T_1MS, tmp2 = T_1US_CNT;
+                        381                             ; SOURCE LINE # 97
+000000 7800       F     382             MOV     R0,#LOW (tmp1?140)
+000002 76D1             383             MOV     @R0,#0D1H
+000004 08               384             INC     R0
+000005 7620             385             MOV     @R0,#020H
+000007 7800       F     386             MOV     R0,#LOW (tmp2?141)
+000009 7600             387             MOV     @R0,#00H
+00000B 08               388             INC     R0
+00000C 760C             389             MOV     @R0,#0CH
+                        390     ;     return ((TH0 << 8 | TL0) - tmp1) / tmp2;
+                        391                             ; SOURCE LINE # 98
+00000E AF8C             392             MOV     R7,TH0
+000010 7E00             393             MOV     R6,#00H
+000012 EF               394             MOV     A,R7
+000013 7F00             395             MOV     R7,#00H
+000015 FE               396             MOV     R6,A
+000016 AD8A             397             MOV     R5,TL0
+000018 7C00             398             MOV     R4,#00H
+00001A EE               399             MOV     A,R6
+00001B 4C               400             ORL     A,R4
+00001C FE               401             MOV     R6,A
+00001D EF               402             MOV     A,R7
+00001E 4D               403             ORL     A,R5
+00001F FF               404             MOV     R7,A
+000020 7800       F     405             MOV     R0,#LOW (tmp1?140)
+000022 E6               406             MOV     A,@R0
+000023 FC               407             MOV     R4,A
+000024 08               408             INC     R0
+000025 E6               409             MOV     A,@R0
+000026 FD               410             MOV     R5,A
+000027 C3               411             CLR     C
+000028 EF               412             MOV     A,R7
+000029 9D               413             SUBB    A,R5
+00002A FF               414             MOV     R7,A
+00002B EE               415             MOV     A,R6
+00002C 9C               416             SUBB    A,R4
+00002D FE               417             MOV     R6,A
+00002E 7800       F     418             MOV     R0,#LOW (tmp2?141)
+000030 E6               419             MOV     A,@R0
+000031 FC               420             MOV     R4,A
+000032 08               421             INC     R0
+000033 E6               422             MOV     A,@R0
+000034 FD               423             MOV     R5,A
+000035 120000     E     424             LCALL   ?C?UIDIV
+                        425     ; }
+                        426                             ; SOURCE LINE # 99
+000038 22               427             RET     
+                        428     ; END OF OS_TIMER_GetUs
+                        429     
+                        430             END
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     8
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -728,17 +471,11 @@ SYMBOL TABLE LISTING
 
 N A M E                                    T Y P E  V A L U E     ATTRIBUTES
 
-?BI?OS_TIMER. . . . . . . . . . . . . .    B  SEG   000001H       REL=UNIT, ALN=BIT
-?C0001. . . . . . . . . . . . . . . . .    C  ADDR  0050H     R   SEG=?PR?T0_ISR?OS_TIMER
-?C0002. . . . . . . . . . . . . . . . .    C  ADDR  008AH     R   SEG=?PR?T0_ISR?OS_TIMER
-?C0005. . . . . . . . . . . . . . . . .    C  ADDR  0115H     R   SEG=?PR?T0_ISR?OS_TIMER
-?C?LSTXDATA . . . . . . . . . . . . . .    C  ADDR  -------       EXT
 ?C?UIDIV. . . . . . . . . . . . . . . .    C  ADDR  -------       EXT
-?DT?OS_TIMER. . . . . . . . . . . . . .    D  SEG   000005H       REL=UNIT, ALN=BYTE
+?DT?OS_TIMER. . . . . . . . . . . . . .    D  SEG   000004H       REL=UNIT, ALN=BYTE
 ?ID?OS_TIMER_GETUS?OS_TIMER . . . . . .    I  SEG   000004H       REL=UNIT, ALN=BYTE
 ?PR?OS_TIMER_GETUS?OS_TIMER . . . . . .    C  SEG   000039H       REL=UNIT, ALN=BYTE
-?PR?OS_TIMER_INIT?OS_TIMER. . . . . . .    C  SEG   00001EH       REL=UNIT, ALN=BYTE
-?PR?T0_ISR?OS_TIMER . . . . . . . . . .    C  SEG   000130H       REL=UNIT, ALN=BYTE
+?PR?OS_TIMER_INIT?OS_TIMER. . . . . . .    C  SEG   00001BH       REL=UNIT, ALN=BYTE
 ?XD?OS_TIMER. . . . . . . . . . . . . .    X  SEG   000001H       REL=UNIT, ALN=BYTE
 AC. . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.6   A   
 ACC . . . . . . . . . . . . . . . . . .    D  ADDR  00E0H     A   
@@ -746,14 +483,6 @@ ADC_CONTR . . . . . . . . . . . . . . .    D  ADDR  00BCH     A
 ADC_RES . . . . . . . . . . . . . . . .    D  ADDR  00BDH     A   
 ADC_RESL. . . . . . . . . . . . . . . .    D  ADDR  00BEH     A   
 ADCCFG. . . . . . . . . . . . . . . . .    D  ADDR  00DEH     A   
-AR0 . . . . . . . . . . . . . . . . . .    D  ADDR  0000H     A   
-AR1 . . . . . . . . . . . . . . . . . .    D  ADDR  0001H     A   
-AR2 . . . . . . . . . . . . . . . . . .    D  ADDR  0002H     A   
-AR3 . . . . . . . . . . . . . . . . . .    D  ADDR  0003H     A   
-AR4 . . . . . . . . . . . . . . . . . .    D  ADDR  0004H     A   
-AR5 . . . . . . . . . . . . . . . . . .    D  ADDR  0005H     A   
-AR6 . . . . . . . . . . . . . . . . . .    D  ADDR  0006H     A   
-AR7 . . . . . . . . . . . . . . . . . .    D  ADDR  0007H     A   
 AUXINTIF. . . . . . . . . . . . . . . .    D  ADDR  00EFH     A   
 AUXR. . . . . . . . . . . . . . . . . .    D  ADDR  008EH     A   
 B . . . . . . . . . . . . . . . . . . .    D  ADDR  00F0H     A   
@@ -788,8 +517,6 @@ EADC. . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.5   A
 ELVD. . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.6   A   
 ES. . . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.4   A   
 ET0 . . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.1   A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    13
-
 ET1 . . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.3   A   
 EX0 . . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.0   A   
 EX1 . . . . . . . . . . . . . . . . . .    B  ADDR  00A8H.2   A   
@@ -804,6 +531,8 @@ IAP_TPS . . . . . . . . . . . . . . . .    D  ADDR  00F5H     A
 IAP_TRIG. . . . . . . . . . . . . . . .    D  ADDR  00C6H     A   
 IE. . . . . . . . . . . . . . . . . . .    D  ADDR  00A8H     A   
 IE0 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.1   A   
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE     9
+
 IE1 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.3   A   
 IE2 . . . . . . . . . . . . . . . . . .    D  ADDR  00AFH     A   
 INTCLKO . . . . . . . . . . . . . . . .    D  ADDR  008FH     A   
@@ -819,10 +548,7 @@ IT0 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.0   A
 IT1 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.2   A   
 LIRTRIM . . . . . . . . . . . . . . . .    D  ADDR  009EH     A   
 ORIGIN_SP . . . . . . . . . . . . . . .    X  ADDR  0000H     R   SEG=?XD?OS_TIMER
-OS_START_ENABLE . . . . . . . . . . . .    B  ADDR  0000H.0   R   SEG=?BI?OS_TIMER
-OS_TASK_SW. . . . . . . . . . . . . . .    C  ADDR  -------       EXT
 OS_TICK . . . . . . . . . . . . . . . .    D  ADDR  0000H     R   SEG=?DT?OS_TIMER
-OS_TIME . . . . . . . . . . . . . . . .    D  ADDR  0004H     R   SEG=?DT?OS_TIMER
 OS_TIMER. . . . . . . . . . . . . . . .    -- ----  -------       
 OS_TIMER_GETUS. . . . . . . . . . . . .    C  ADDR  0000H     R   SEG=?PR?OS_TIMER_GETUS?OS_TIMER
 OS_TIMER_INIT . . . . . . . . . . . . .    C  ADDR  0000H     R   SEG=?PR?OS_TIMER_INIT?OS_TIMER
@@ -856,8 +582,6 @@ P21 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.1   A
 P22 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.2   A   
 P23 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.3   A   
 P24 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.4   A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    14
-
 P25 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.5   A   
 P26 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.6   A   
 P27 . . . . . . . . . . . . . . . . . .    B  ADDR  00A0H.7   A   
@@ -875,6 +599,8 @@ P37 . . . . . . . . . . . . . . . . . .    B  ADDR  00B0H.7   A
 P3M0. . . . . . . . . . . . . . . . . .    D  ADDR  00B2H     A   
 P3M1. . . . . . . . . . . . . . . . . .    D  ADDR  00B1H     A   
 P4. . . . . . . . . . . . . . . . . . .    D  ADDR  00C0H     A   
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE    10
+
 P40 . . . . . . . . . . . . . . . . . .    B  ADDR  00C0H.0   A   
 P41 . . . . . . . . . . . . . . . . . .    B  ADDR  00C0H.1   A   
 P42 . . . . . . . . . . . . . . . . . .    B  ADDR  00C0H.2   A   
@@ -924,8 +650,6 @@ PADC. . . . . . . . . . . . . . . . . .    B  ADDR  00B8H.5   A
 PCA_PWM0. . . . . . . . . . . . . . . .    D  ADDR  00F2H     A   
 PCA_PWM1. . . . . . . . . . . . . . . .    D  ADDR  00F3H     A   
 PCA_PWM2. . . . . . . . . . . . . . . .    D  ADDR  00F4H     A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    15
-
 PCON. . . . . . . . . . . . . . . . . .    D  ADDR  0087H     A   
 PLVD. . . . . . . . . . . . . . . . . .    B  ADDR  00B8H.6   A   
 PPCA. . . . . . . . . . . . . . . . . .    B  ADDR  00B8H.7   A   
@@ -943,9 +667,10 @@ RB8 . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.2   A
 REN . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.4   A   
 RI. . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.0   A   
 RS0 . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.3   A   
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/26/22 01:52:08 PAGE    11
+
 RS1 . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.4   A   
 RSTCFG. . . . . . . . . . . . . . . . .    D  ADDR  00FFH     A   
-RUNNING_TASK. . . . . . . . . . . . . .    X  ADDR  -------       EXT
 S2BUF . . . . . . . . . . . . . . . . .    D  ADDR  009BH     A   
 S2CON . . . . . . . . . . . . . . . . .    D  ADDR  009AH     A   
 S3BUF . . . . . . . . . . . . . . . . .    D  ADDR  00ADH     A   
@@ -963,7 +688,6 @@ SP. . . . . . . . . . . . . . . . . . .    D  ADDR  0081H     A
 SPCTL . . . . . . . . . . . . . . . . .    D  ADDR  00CEH     A   
 SPDAT . . . . . . . . . . . . . . . . .    D  ADDR  00CFH     A   
 SPSTAT. . . . . . . . . . . . . . . . .    D  ADDR  00CDH     A   
-T0_ISR. . . . . . . . . . . . . . . . .    C  ADDR  0000H     R   SEG=?PR?T0_ISR?OS_TIMER
 T2H . . . . . . . . . . . . . . . . . .    D  ADDR  00D6H     A   
 T2L . . . . . . . . . . . . . . . . . .    D  ADDR  00D7H     A   
 T3H . . . . . . . . . . . . . . . . . .    D  ADDR  00D4H     A   
@@ -982,8 +706,8 @@ TI. . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.1   A
 TL0 . . . . . . . . . . . . . . . . . .    D  ADDR  008AH     A   
 TL1 . . . . . . . . . . . . . . . . . .    D  ADDR  008BH     A   
 TMOD. . . . . . . . . . . . . . . . . .    D  ADDR  0089H     A   
-TMP1?240. . . . . . . . . . . . . . . .    I  ADDR  0000H     R   SEG=?ID?OS_TIMER_GETUS?OS_TIMER
-TMP2?241. . . . . . . . . . . . . . . .    I  ADDR  0002H     R   SEG=?ID?OS_TIMER_GETUS?OS_TIMER
+TMP1?140. . . . . . . . . . . . . . . .    I  ADDR  0000H     R   SEG=?ID?OS_TIMER_GETUS?OS_TIMER
+TMP2?141. . . . . . . . . . . . . . . .    I  ADDR  0002H     R   SEG=?ID?OS_TIMER_GETUS?OS_TIMER
 TR0 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.4   A   
 TR1 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.6   A   
 WDT_CONTR . . . . . . . . . . . . . . .    D  ADDR  00C1H     A   
@@ -992,8 +716,6 @@ WKTCL . . . . . . . . . . . . . . . . .    D  ADDR  00AAH     A
 
 
 REGISTER BANK(S) USED: 0 
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/22/22 03:56:31 PAGE    16
-
 
 
 ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S).

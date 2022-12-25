@@ -30,7 +30,6 @@
 */
 
 extern volatile u32 data os_tick;   //系统计时器，无符号32位(4字节)
-extern volatile bit data os_start_enable;   //启动标识
 
 extern u8 xdata origin_sp; //原始栈指针
 

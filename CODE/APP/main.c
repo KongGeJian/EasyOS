@@ -3,6 +3,7 @@
 #include <intrins.h>
 
 #include "bsp.h"
+#include "os.h"
 
 
 u8 idata task1_stack[20];
@@ -15,7 +16,7 @@ void task1()
     while (1)
     {
         P10 = ~P10;
-        delay_ms(2);
+        OS_TaskWait(EVENT_TIMEOUT, 2);
     }
 }
 
@@ -23,8 +24,10 @@ void task2()
 {
     while (1)
     {
-        P11 = ~P11;
-        delay_ms(5);
+        P11 = 1;
+        delay_ms(2);
+        P11 = 0;
+        OS_TaskWait(EVENT_INTERVAL, 5);
     }
 }
 
@@ -36,10 +39,10 @@ void createTask()
 
 void main()
 {   
+    BSP_Init();
+    BSP_UART_SendString(UART1, "STRBUF_LEN too small.\n");
+    
     OS_Init();
-    delay_init();
-    
     createTask();
-    
     OS_Start();
 }
