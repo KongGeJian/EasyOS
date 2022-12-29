@@ -10,8 +10,7 @@
 * Tip(s)  : 说明：
 *             + 栈：51是满增栈，即SP总是指向最后一个入栈的字节的地址，每入栈一次SP+1
 *             + 栈空间：SP是8位，只能指向idata。并且栈内存没法通过malloc动态分配，这里用户自定义
-*             + 内存分配：init_mempool、malloc分配的内存，每个内存段会额外占用4个字节记录被分配的内存占用的长度信息
-+             + 寄存器组：任务运行使用bank=0，定时器T0调度用bank=1，编译后的代码，还使用bank=0，编译有bug
++             + 寄存器组：任务运行使用bank=0，定时器T0调度用bank=1，编译后的代码，定时调用函数还再用bank=0，编译有bug
 *********************************************************************************************************
 */
 
@@ -26,9 +25,6 @@
 */
 
 #define STACK_DEFVAL 0xA5       //栈默认值
-
-//启动标识
-// volatile bit data os_start_enable;
 
 //执行中任务
 volatile OS_TASK_TYP xdata * xdata running_task _at_ 0x01F0;
@@ -52,7 +48,7 @@ const char code idle_task_name[] = "OS_IdleTask";
 *********************************************************************************************************
 */
 
-//初始化任务
+//初始化任务字段
 void _Init_Task(OS_TASK_TYP xdata *task, OS_TASK_STACK_TYP xdata *stack) large
 {
     stack->base = NULL;
@@ -62,10 +58,11 @@ void _Init_Task(OS_TASK_TYP xdata *task, OS_TASK_STACK_TYP xdata *stack) large
     task->handle = NULL;    //函数地址，指针类型
     task->name = NULL;
     task->stack = stack;
-    task->state = NONE;
+    task->state = 0;
     task->time_statistics = 0;
     task->time_slice = 0;
-    task->time_blocked = 0;
+    task->blocked_time = 0;
+    task->blocked_semaphore = 0;
     task->prev = NULL;
     task->next = NULL;
 }
@@ -233,7 +230,7 @@ void OS_Init(void) large
 *********************************************************************************************************
 * Description : 系统启动
 *
-* Note(s)     : none.
+* Note(s)     : 启动后第一个任务是 OS_IdleTask，这里只需RET弹出函数入口地址到PC即可。
 *********************************************************************************************************
 */
 void OS_Start(void) large
@@ -254,21 +251,21 @@ void OS_Start(void) large
 *
 * Argument(s) : none.
 *
-* Note(s)     : 标记 运行中任务 和 阻塞中任务
+* Note(s)     : 标记只处理：运行中任务、阻塞中任务
 *********************************************************************************************************
 */
 void OS_TaskMark(void) large
 {
     OS_TASK_TYP xdata *t_p;
-    u8 i;
+    register u8 i;
     //运行中任务
     if (running_task != NULL)
     {
         running_task->time_statistics++;
         if (running_task->time_slice != 0)
             running_task->time_slice--;
-        if (running_task->time_blocked != 0)
-            running_task->time_blocked--;
+        if (running_task->blocked_time != 0)
+            running_task->blocked_time--;
     }
     //阻塞中任务
     for (i = blocked_task_list->size; i > 0; i--)
@@ -276,9 +273,9 @@ void OS_TaskMark(void) large
         t_p = _Pop_TaskList(blocked_task_list);
         if (t_p == NULL)
             continue;
-        if (t_p->time_blocked != 0)
-            t_p->time_blocked--;
-        if (t_p->time_blocked == 0)
+        if (t_p->blocked_time != 0)
+            t_p->blocked_time--;
+        if (t_p->blocked_time == 0 && t_p.blocked_semaphore == 0)
         {
             t_p->state = READY;
             _Push_TaskList(ready_task_list, t_p);
@@ -296,16 +293,16 @@ void OS_TaskMark(void) large
 *
 * Argument(s) : none.
 *
-* Note(s)     : 在定时器中断中调用此函数.注意不同Bank的影响
+* Note(s)     : 在定时器中断中调用此函数。注意不同Bank的影响
 *********************************************************************************************************
 */
 void OS_TaskSwitch(void) large
 {
     if (running_task != NULL && running_task->time_slice != 0)
         return;
-    // 栈溢出检测，只需检测当前运行中的任务即可
+    //栈溢出检测，只需检测当前运行中的任务即可
     _StackOverflow_Check(running_task);
-
+    //运行中任务，状态切换。运行中 -> 就绪、阻塞、死亡
     if (running_task != NULL)
     {
         switch (running_task->state)
@@ -315,7 +312,7 @@ void OS_TaskSwitch(void) large
             _Push_TaskList(ready_task_list, running_task);
             break;
         case BLOCKED:
-            if (running_task->time_blocked == 0)
+            if (running_task->blocked_time == 0 && running_task->blocked_semaphore == 0)
             {
                 running_task->state = READY;
                 _Push_TaskList(ready_task_list, running_task);
@@ -330,6 +327,7 @@ void OS_TaskSwitch(void) large
             break;
         }
     }
+    //从就绪队列弹出一个可运行任务
     running_task = _Pop_TaskList(ready_task_list);
     while (running_task != NULL)
     {
@@ -337,7 +335,7 @@ void OS_TaskSwitch(void) large
         {
             running_task->state = RUNNING;
             running_task->time_slice = OS_TIME_SLICE;
-            running_task->time_blocked = 0xFF;
+            running_task->blocked_time = 0xFF;
             break;
         }
         else if (running_task->state == DEAD)
@@ -352,29 +350,53 @@ void OS_TaskSwitch(void) large
 *********************************************************************************************************
 * Description : 任务等待
 *
-* Argument(s) : event - 事件类型
-*               nms - 延迟时间
+* Argument(s) : event - 事件类型。参考OS_EVENT_E_TYP。EVENT_INTERVAL 和 EVENT_TIMEOUT 不可同时使用。EVENT_TIMEOUT | EVENT_SIGNAL 表示倒计时结束，同时信号到达
+*               nms - 延迟时间。nms=0，表示让出当前cpu
+*               semaphore - 需等待信号量。8位长度，用户可自定义使用，比如按位定义8个信号。
 *
-* Note(s)     : 只处理当前运行中任务。nms=0，表示让出当前cpu，然后进入就绪队列
+* Note(s)     : 只处理当前运行中任务。当前任务进入阻塞状态，不会立即进入调度切换，等待定时器下次tick时切换。
 *********************************************************************************************************
 */
-void OS_TaskWait(OS_EVENT_E_TYP event, u8 nms) compact reentrant
+void OS_TaskWait(OS_EVENT_E_TYP event, u8 nms, u8 semaphore) compact reentrant
 {
     u8 elapsed;
     if (running_task == NULL)
         return;
     running_task->state = BLOCKED;
-    if (event == EVENT_INTERVAL)
+    // EVENT_INTERVAL 和 EVENT_TIMEOUT，优先取EVENT_INTERVAL
+    if ((event & EVENT_INTERVAL) == EVENT_INTERVAL)
     {
-        elapsed = 0xFF - running_task->time_blocked;
-        running_task->time_blocked = (elapsed >= nms) ? 0 : (nms - elapsed);
+        elapsed = 0xFF - running_task->blocked_time;
+        running_task->blocked_time = (elapsed >= nms) ? 0 : (nms - elapsed);
     }
-    else if (event == EVENT_TIMEOUT)
+    else if ((event & EVENT_TIMEOUT) == EVENT_TIMEOUT)
     {
-        running_task->time_blocked = nms;
+        running_task->blocked_time = nms;
     }
+    if ((event & EVENT_SIGNAL) == EVENT_SIGNAL)
+    {
+        running_task->blocked_semaphore = semaphore;
+    }
+
     running_task->time_slice = 0;   //时间片归0，让出CPU
     while (running_task->state != RUNNING); //等下下次进入运行态，继续开始运行
+}
+
+/*
+*********************************************************************************************************
+* Description : 任务信号到达
+*
+* Argument(s) : task - 任务句柄。调用 OS_CreateTask 的返回值。
+*               semaphore - 到达信号。无论用户定怎么定义，这里只需按位清楚即可，比如传入 0x02, 将任务中第2位(从第到高)清0。
+*
+* Note(s)     : 理论上，task应该只会处于阻塞队列中；同时不能对当前任务设置。
+*********************************************************************************************************
+*/
+void OS_TaskSignal(OS_TASK_TYP xdata *task, u8 semaphore) large
+{
+    if (task == NULL || task == running_task)
+        return;
+    task->blocked_semaphore &= ~semaphore;
 }
 
 /*
@@ -410,7 +432,7 @@ OS_TASK_TYP * OS_CreateTask(TaskHook task, const char code *task_name, u8 idata 
     if (ts_p == NULL || t_p == NULL)
         _Heap_NotEnough("OS_CreateTask", task_name);
     
-    //初始化堆任务参数
+    //初始化堆任务字段
     _Init_Task(t_p, ts_p);
 
     t_p->stack->base = stack_base;
@@ -460,7 +482,7 @@ void OS_DeleteTask(OS_TASK_TYP xdata *task) large
 *
 * Argument(s) : none.
 *
-* Note(s)     : OS_Start 是自动创建，用于空闲统计、任务回收 等
+* Note(s)     : 用户禁止创建，OS_Start 是自动创建，用于空闲统计、任务回收 等
 *********************************************************************************************************
 */
 void OS_IdleTask(void) large

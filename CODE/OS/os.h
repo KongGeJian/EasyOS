@@ -38,18 +38,17 @@
 
 typedef  void (*TaskHook)(void); //任务函数钩子
 
-//事件
+//事件（可以多个事件按位或，表示多事件组合）
 typedef enum
 {
-    EVENT_INTERVAL, //间隔
-    EVENT_TIMEOUT,  //超时
-    EVENT_SIGNAL,   //信号 TODO 预留
+    EVENT_INTERVAL = 0x01,  //间隔
+    EVENT_TIMEOUT = 0x02,   //超时
+    EVENT_SIGNAL = 0x10,    //信号
 } OS_EVENT_E_TYP;
 
 //任务状态
 typedef enum
 {
-    NONE,
     READY = 1,  //1-就绪：已具备执行能力，等待调度器调度
     RUNNING,    //2-运行：任务正在执行，此时它占用CPU
     BLOCKED,    //3-阻塞：当前任务正在等待某个时序或外部中断。包含任务被延时、任务等待信号量、任务等待读写队列或者读写事件等。
@@ -60,21 +59,22 @@ typedef enum
 //任务栈（3字节+4）
 typedef struct OS_TASK_STACK
 {
-    uint8_t idata *base;   //栈底
-    uint8_t len;    //栈大小
-    uint8_t idata *sp;     //当前栈顶
+    uint8_t idata *base;//栈底
+    uint8_t len;        //栈大小
+    uint8_t idata *sp;  //当前栈顶
 } OS_TASK_STACK_TYP;
 
-//任务（20字节+4）
+//任务（21字节+4）
 typedef struct OS_TASK
 {
-    TaskHook handle;            //要运行的任务函数
-    const char code *name;      //任务名称
+    TaskHook handle;                    //要运行的任务函数
+    const char code *name;              //任务名称
     OS_TASK_STACK_TYP xdata *stack;     //绑定的栈
     volatile OS_TASK_STATE_E_TYP state; //程序状态
     volatile uint32_t time_statistics;  //时间统计，tick一次+1
     volatile uint8_t time_slice;        //时间片，从 OS_TIME_SLICE 倒计时
-    volatile uint8_t time_blocked;      //时间阻塞，任务首次进入，初始值 0xFF，tick一次-1
+    volatile uint8_t blocked_time;      //阻塞时间，初始值 0xFF，tick一次-1
+    volatile uint8_t blocked_semaphore; //阻塞信号量，初始值0，8位字节，用户自己使用
     volatile struct OS_TASK *prev;      //前一个任务
     volatile struct OS_TASK *next;      //后一个任务
 } OS_TASK_TYP;
@@ -103,7 +103,8 @@ extern void OS_Start(void) large;
 
 extern void OS_TaskMark(void) large;
 extern void OS_TaskSwitch(void) large;
-extern void OS_TaskWait(OS_EVENT_E_TYP event, u8 nms) compact reentrant;
+extern void OS_TaskWait(OS_EVENT_E_TYP event, u8 nms, u8 semaphore) compact reentrant;
+extern void OS_TaskSignal(OS_TASK_TYP xdata *task, u8 semaphore) large;
 
 extern OS_TASK_TYP * OS_CreateTask(TaskHook task, const char code *task_name, u8 idata *stack_base, u8 stack_len) large;
 extern void OS_DeleteTask(OS_TASK_TYP xdata *task) large;
