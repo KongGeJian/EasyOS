@@ -16,7 +16,7 @@ void task1()
     while (1)
     {
         P10 = ~P10;
-        OS_TaskWait(EVENT_TIMEOUT, 2);
+        OS_TaskWait(EVENT_TIMEOUT, 2, 0);
     }
 }
 
@@ -27,7 +27,7 @@ void task2()
         P11 = 1;
         delay_ms(2);
         P11 = 0;
-        OS_TaskWait(EVENT_INTERVAL, 5);
+        OS_TaskWait(EVENT_INTERVAL, 5, 0);
     }
 }
 

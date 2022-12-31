@@ -58,7 +58,7 @@ void _Init_Task(OS_TASK_TYP xdata *task, OS_TASK_STACK_TYP xdata *stack) large
     task->handle = NULL;    //函数地址，指针类型
     task->name = NULL;
     task->stack = stack;
-    task->state = 0;
+    task->state = READY;
     task->time_statistics = 0;
     task->time_slice = 0;
     task->blocked_time = 0;
@@ -275,7 +275,7 @@ void OS_TaskMark(void) large
             continue;
         if (t_p->blocked_time != 0)
             t_p->blocked_time--;
-        if (t_p->blocked_time == 0 && t_p.blocked_semaphore == 0)
+        if (t_p->blocked_time == 0 && t_p->blocked_semaphore == 0)
         {
             t_p->state = READY;
             _Push_TaskList(ready_task_list, t_p);
@@ -493,7 +493,7 @@ void OS_IdleTask(void) large
         //任务回收
         _Delete_Task(hidden_task_list);
         //让出CPU
-        OS_TaskWait(EVENT_TIMEOUT, 0);
+        OS_TaskWait(EVENT_TIMEOUT, 0, 0);
     }
 }
 

@@ -51,7 +51,8 @@
 #define S2RB8 0x04          //S2CON.2
 #define S2TB8 0x08          //S2CON.3
 
-bit busy;
+volatile bit busy;
+volatile bit busy_println;
 
 
 //串口1读取的缓存数据，外部使用声明即可: extern byte xdata u1_r_data;
@@ -80,6 +81,7 @@ static void _UART1_SendByte(byte dat) compact reentrant
 #if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
 #endif
+    busy = 1;               //标志位置位，由中断清除
     ACC = dat;              //计算偶数奇偶校验位P（PSW.0）
     if (P)                  //根据P设置奇偶校验位
     {
@@ -97,7 +99,6 @@ static void _UART1_SendByte(byte dat) compact reentrant
         TB8 = 0;            //将奇偶校验位设置为0
 #endif
     }
-    busy = 1;               //标志位置位，由中断清除
     SBUF = ACC;             //将数据发送到UART缓冲区
 }
 
@@ -107,6 +108,7 @@ static void _UART2_SendByte(byte dat) compact reentrant
 #if (DEBUG_USE_SIMULATOR == 0)
     while (busy);           //等待上一个数据发送完成
 #endif
+    busy = 1;               //标志位置位，由中断清除
     ACC = dat;              //计算偶数奇偶校验位P（PSW.0）
     if (P)                  //根据P设置奇偶校验位
     {
@@ -124,7 +126,6 @@ static void _UART2_SendByte(byte dat) compact reentrant
         S2CON &= ~S2TB8;    //将奇偶校验位设置为0
 #endif
     }
-    busy = 1;               //标志位置位，由中断清除
     S2BUF = ACC;            //将数据发送到UART2缓冲区
 }
 
@@ -146,8 +147,8 @@ void UART1_ISR() interrupt 4 using 3
     }
     if (TI) //发送
     {
-        TI = 0;             //Clear transmit interrupt flag
-        busy = 0;           //Clear transmit busy flag
+        TI = 0;             //清除发送中断标志
+        busy = 0;           //清除发送忙标志
     }
 }
 
@@ -204,6 +205,7 @@ void BSP_UART_Init(void) large
     EA = 1;                 //开主中断开关，其他地方已经打开
 
     busy = 0;
+    busy_println = 0;
 }
 
 /*
@@ -260,6 +262,9 @@ void BSP_UART_Println(UART_E_TYP uart, const char *format, ...) compact reentran
     va_list aptr;
     int16_t len;
 
+    while (busy_println);
+    busy_println = 1;
+
     strbuf = calloc(STRBUF_LEN, sizeof(char));
     if (strbuf == NULL)
     {
@@ -280,6 +285,8 @@ void BSP_UART_Println(UART_E_TYP uart, const char *format, ...) compact reentran
     BSP_UART_SendByte(uart, '\n');
 
     free(strbuf);
+    
+    busy_println = 0;
 }
 
 /**********************************************RND******************************************************/
