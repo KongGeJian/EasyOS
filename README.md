@@ -80,7 +80,7 @@ T0作为系统时钟定时器，设定一个系统时钟 `os_tick=1ms`。
 注意：
 + 任务栈需要用户自定义，每个栈至少要16个字节。
 + 内存堆需要用户根据硬件内存，合理设置 `MEM_POOL_SIZE`
-+ 只是单纯实现任务基本功能，就需要 Program Size: data=103.3 xdata=373 const=161 code=8k+
++ 只是单纯实现任务基本功能，就需要 Program Size: data=143.3 xdata=585 const=354 code=7981
 
 # 5. 优化
 
