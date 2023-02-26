@@ -193,15 +193,10 @@
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>strbuf</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
           <ItemText>blocked_task_list</ItemText>
         </Ww>
         <Ww>
-          <count>13</count>
+          <count>12</count>
           <WinNumber>1</WinNumber>
           <ItemText>hidden_task_list</ItemText>
         </Ww>

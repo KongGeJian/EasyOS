@@ -212,15 +212,15 @@ void BSP_UART_Init(void) large
 *********************************************************************************************************
 * Description : UART发送字节数据
 *
-* Argument(s) : UART - 串口枚举 UART1/UART2
+* Argument(s) : uart - 串口枚举，参考 UART_E_TYP
 *               dat - 要发送的数据
 *
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void BSP_UART_SendByte(UART_E_TYP UART, byte dat) compact reentrant
+void BSP_UART_SendByte(UART_E_TYP uart, byte dat) compact reentrant
 {
-    if (UART == UART1)
+    if (uart == UART1)
         _UART1_SendByte(dat);
     else
         _UART2_SendByte(dat);
@@ -239,11 +239,11 @@ void BSP_UART_SendByte(UART_E_TYP UART, byte dat) compact reentrant
 void BSP_UART_SendString(UART_E_TYP uart, const char *s) compact reentrant
 {
     if (uart == UART1)
-        while (*s)                //检查字符串的结尾
-            _UART1_SendByte(*s++);//发送当前字符，后自增字符串地址指针
+        while (*s)                  //检查字符串的结尾
+            _UART1_SendByte(*s++);  //发送当前字符，后自增字符串地址指针
     else
-        while (*s)                //检查字符串的结尾
-            _UART2_SendByte(*s++);//发送当前字符，后自增字符串地址指针
+        while (*s)                  //检查字符串的结尾
+            _UART2_SendByte(*s++);  //发送当前字符，后自增字符串地址指针
 }
 
 /*

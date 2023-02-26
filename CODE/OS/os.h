@@ -34,8 +34,6 @@
 
 #define OS_TIME_SLICE   10  //系统滴答数，表示10个os_tick
 
-#define OS_TASK_NUM     2   //最大可运行任务数
-
 typedef  void (*TaskHook)(void); //任务函数钩子
 
 //事件（可以多个事件按位或，表示多事件组合）

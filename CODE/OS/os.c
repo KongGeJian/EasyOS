@@ -97,6 +97,7 @@ void _Delete_Task(OS_TASK_LIST_TYP xdata *task_list) large
             {
                 t_p->prev->next = t_p->next;
                 t_p->next->prev = t_p->prev;
+                task_list->size--;
             }
             t_p = t_p->next;
 
@@ -407,6 +408,8 @@ void OS_TaskSignal(OS_TASK_TYP xdata *task, u8 semaphore) large
 *               task_name - 任务名
 *               stack_base - 任务栈首地址
 *               stack_len - 任务栈长度，最小16
+*
+* Return(s)   : 创建好的任务地址
 *
 * Note(s)     : none.
 *********************************************************************************************************

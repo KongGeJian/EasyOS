@@ -53,9 +53,9 @@ extern volatile byte pdata u2_r_parity;
 
 extern void  BSP_UART_Init(void) large;
 
-extern void  BSP_UART_SendByte(UART_E_TYP UART, byte dat) compact reentrant;
-extern void  BSP_UART_SendString(UART_E_TYP UART, const char *s) compact reentrant;
-extern void  BSP_UART_Println(UART_E_TYP UART, const char *format, ...) compact reentrant;
+extern void  BSP_UART_SendByte(UART_E_TYP uart, byte dat) compact reentrant;
+extern void  BSP_UART_SendString(UART_E_TYP uart, const char *s) compact reentrant;
+extern void  BSP_UART_Println(UART_E_TYP uart, const char *format, ...) compact reentrant;
 
 
 #endif
