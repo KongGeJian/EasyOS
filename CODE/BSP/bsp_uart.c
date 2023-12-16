@@ -61,7 +61,7 @@ volatile byte pdata u1_r_data;
 volatile byte pdata u1_r_parity;
 //串口2读取的缓存数据，外部使用声明即可: extern byte xdata u2_r_data;
 volatile byte pdata u2_r_data;
-//串口1读取的奇偶校验位，外部使用声明即可: extern bit  xdata u2_r_parity;
+//串口2读取的奇偶校验位，外部使用声明即可: extern bit  xdata u2_r_parity;
 volatile byte pdata u2_r_parity;
 
 //字符串buf
