@@ -1,9 +1,0 @@
-".\Objects\STARTUP.obj",
-".\Objects\main.obj",
-".\Objects\lib_delay.obj",
-".\Objects\os.obj",
-".\Objects\os_timer.obj" 
-TO ".\Objects\EasyOS" 
-
-PRINT(".\Listings\EasyOS.map") IXREF 
-REMOVEUNUSED 
