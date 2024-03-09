@@ -1,6 +1,6 @@
-# 1. EasyOS
+# 1. 项目
 
-简单OS/RTOS。
+`EasyOS` 简单OS/RTOS。
 
 ---
 ---
