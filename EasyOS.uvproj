@@ -324,7 +324,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS</IncludePath>
+              <IncludePath>C:\DevTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS</IncludePath>
             </VariousControls>
           </C51>
           <Ax51>

@@ -1,17 +1,17 @@
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     1
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     1
 
 
 MACRO ASSEMBLER AX51 V3.15.3.0
 OBJECT MODULE PLACED IN .\Objects\os_timer.OBJ
-ASSEMBLER INVOKED BY: C:\DevelopTool\Keil_v5\C51\BIN\AX51.EXE .\Objects\os_timer.src PR(.\Listings\os_timer.ls1) EP DEBUG
+ASSEMBLER INVOKED BY: C:\DevTool\Keil_v5\C51\BIN\AX51.EXE .\Objects\os_timer.src PR(.\Listings\os_timer.ls1) EP DEBUG
 
 LOC    OBJ             LINE     SOURCE
 
                           1     ; .\Objects\os_timer.SRC generated from: CODE\OS\os_timer.c
                           2     ; COMPILER INVOKED BY:
-                          3     ;        C:\DevelopTool\Keil_v5\C51\BIN\C51.EXE CODE\OS\os_timer.c OMF2 OPTIMIZE(1,SPEED
-                               ) BROWSE INCDIR(C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\
-                               CODE\OS) DEBUG CODE SYMBOLS PRINT(.\Listings\os_timer.lst) PREPRINT(.\Listings\os_timer.i) SRC(.\Objects\os_timer.SRC)
+                          3     ;        C:\DevTool\Keil_v5\C51\BIN\C51.EXE CODE\OS\os_timer.c OMF2 OPTIMIZE(1,SPEED) BR
+                               OWSE INCDIR(C:\DevTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS)
+                                DEBUG CODE SYMBOLS PRINT(.\Listings\os_timer.lst) PREPRINT(.\Listings\os_timer.i) SRC(.\Objects\os_timer.SRC)
                           4     
                           5     $nomod51 
                           6     
@@ -65,7 +65,7 @@ LOC    OBJ             LINE     SOURCE
  00EA                    54     CCAP0L  DATA    0EAH
  00D8.6                  55     CR      BIT     0D8H.6
  00AE                    56     TA      DATA    0AEH
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     2
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     2
 
  00EB                    57     CCAP1L  DATA    0EBH
  00DA                    58     CCAPM0  DATA    0DAH
@@ -133,7 +133,7 @@ LOC    OBJ             LINE     SOURCE
  00F8.0                 120     P70     BIT     0F8H.0
  00E8.1                 121     P61     BIT     0E8H.1
  00C8.2                 122     P52     BIT     0C8H.2
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     3
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     3
 
  00C0.3                 123     P43     BIT     0C0H.3
  00B8.6                 124     PLVD    BIT     0B8H.6
@@ -201,7 +201,7 @@ LOC    OBJ             LINE     SOURCE
  008B                   186     TL1     DATA    08BH
  00D7                   187     T2L     DATA    0D7H
  0098.5                 188     SM2     BIT     098H.5
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     4
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     4
 
  00D5                   189     T3L     DATA    0D5H
  00D3                   190     T4L     DATA    0D3H
@@ -269,7 +269,7 @@ LOC    OBJ             LINE     SOURCE
 ------                  252             RSEG  ?DT?OS_TIMER
 000000                  253             os_tick:   DS   4
                         254     ; /*
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     5
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     5
 
                         255     ; **************************************************************************************
                                *******************
@@ -337,7 +337,7 @@ LOC    OBJ             LINE     SOURCE
                         310     ; //         origin_sp = SP;
                         311     ; //         SP = running_task->stack->sp;
                         312     ; //     }
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     6
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     6
 
                         313     ; //     //==弹栈==
                         314     ; // }
@@ -405,7 +405,7 @@ LOC    OBJ             LINE     SOURCE
                         372     ; u16 OS_TIMER_GetUs(void)
                         373     
 ------                  374             RSEG  ?PR?OS_TIMER_GetUs?OS_TIMER
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     7
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     7
 
 000000                  375     OS_TIMER_GetUs:
                         376             USING   0
@@ -418,52 +418,49 @@ LOC    OBJ             LINE     SOURCE
 000002 76D1             383             MOV     @R0,#0D1H
 000004 08               384             INC     R0
 000005 7620             385             MOV     @R0,#020H
-000007 7800       F     386             MOV     R0,#LOW (tmp2?141)
-000009 7600             387             MOV     @R0,#00H
-00000B 08               388             INC     R0
-00000C 760C             389             MOV     @R0,#0CH
+000007 08               386             INC     R0
+000008 7600             387             MOV     @R0,#00H
+00000A 08               388             INC     R0
+00000B 760C             389             MOV     @R0,#0CH
                         390     ;     return ((TH0 << 8 | TL0) - tmp1) / tmp2;
                         391                             ; SOURCE LINE # 98
-00000E AF8C             392             MOV     R7,TH0
-000010 7E00             393             MOV     R6,#00H
-000012 EF               394             MOV     A,R7
-000013 7F00             395             MOV     R7,#00H
-000015 FE               396             MOV     R6,A
-000016 AD8A             397             MOV     R5,TL0
-000018 7C00             398             MOV     R4,#00H
-00001A EE               399             MOV     A,R6
-00001B 4C               400             ORL     A,R4
-00001C FE               401             MOV     R6,A
-00001D EF               402             MOV     A,R7
-00001E 4D               403             ORL     A,R5
-00001F FF               404             MOV     R7,A
-000020 7800       F     405             MOV     R0,#LOW (tmp1?140)
-000022 E6               406             MOV     A,@R0
-000023 FC               407             MOV     R4,A
-000024 08               408             INC     R0
-000025 E6               409             MOV     A,@R0
-000026 FD               410             MOV     R5,A
-000027 C3               411             CLR     C
-000028 EF               412             MOV     A,R7
-000029 9D               413             SUBB    A,R5
-00002A FF               414             MOV     R7,A
-00002B EE               415             MOV     A,R6
-00002C 9C               416             SUBB    A,R4
-00002D FE               417             MOV     R6,A
-00002E 7800       F     418             MOV     R0,#LOW (tmp2?141)
-000030 E6               419             MOV     A,@R0
-000031 FC               420             MOV     R4,A
-000032 08               421             INC     R0
-000033 E6               422             MOV     A,@R0
-000034 FD               423             MOV     R5,A
-000035 120000     E     424             LCALL   ?C?UIDIV
-                        425     ; }
-                        426                             ; SOURCE LINE # 99
-000038 22               427             RET     
-                        428     ; END OF OS_TIMER_GetUs
-                        429     
-                        430             END
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     8
+00000D AF8C             392             MOV     R7,TH0
+00000F 7E00             393             MOV     R6,#00H
+000011 EF               394             MOV     A,R7
+000012 7F00             395             MOV     R7,#00H
+000014 FE               396             MOV     R6,A
+000015 AD8A             397             MOV     R5,TL0
+000017 7C00             398             MOV     R4,#00H
+000019 EF               399             MOV     A,R7
+00001A ED               400             MOV     A,R5
+00001B FF               401             MOV     R7,A
+00001C 7800       F     402             MOV     R0,#LOW (tmp1?140)
+00001E E6               403             MOV     A,@R0
+00001F FC               404             MOV     R4,A
+000020 08               405             INC     R0
+000021 E6               406             MOV     A,@R0
+000022 FD               407             MOV     R5,A
+000023 C3               408             CLR     C
+000024 EF               409             MOV     A,R7
+000025 9D               410             SUBB    A,R5
+000026 FF               411             MOV     R7,A
+000027 EE               412             MOV     A,R6
+000028 9C               413             SUBB    A,R4
+000029 FE               414             MOV     R6,A
+00002A 08               415             INC     R0
+00002B E6               416             MOV     A,@R0
+00002C FC               417             MOV     R4,A
+00002D 08               418             INC     R0
+00002E E6               419             MOV     A,@R0
+00002F FD               420             MOV     R5,A
+000030 120000     E     421             LCALL   ?C?UIDIV
+                        422     ; }
+                        423                             ; SOURCE LINE # 99
+000033 22               424             RET     
+                        425     ; END OF OS_TIMER_GetUs
+                        426     
+                        427             END
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     8
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -474,7 +471,7 @@ N A M E                                    T Y P E  V A L U E     ATTRIBUTES
 ?C?UIDIV. . . . . . . . . . . . . . . .    C  ADDR  -------       EXT
 ?DT?OS_TIMER. . . . . . . . . . . . . .    D  SEG   000004H       REL=UNIT, ALN=BYTE
 ?ID?OS_TIMER_GETUS?OS_TIMER . . . . . .    I  SEG   000004H       REL=UNIT, ALN=BYTE
-?PR?OS_TIMER_GETUS?OS_TIMER . . . . . .    C  SEG   000039H       REL=UNIT, ALN=BYTE
+?PR?OS_TIMER_GETUS?OS_TIMER . . . . . .    C  SEG   000034H       REL=UNIT, ALN=BYTE
 ?PR?OS_TIMER_INIT?OS_TIMER. . . . . . .    C  SEG   00001BH       REL=UNIT, ALN=BYTE
 ?XD?OS_TIMER. . . . . . . . . . . . . .    X  SEG   000001H       REL=UNIT, ALN=BYTE
 AC. . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.6   A   
@@ -531,7 +528,7 @@ IAP_TPS . . . . . . . . . . . . . . . .    D  ADDR  00F5H     A
 IAP_TRIG. . . . . . . . . . . . . . . .    D  ADDR  00C6H     A   
 IE. . . . . . . . . . . . . . . . . . .    D  ADDR  00A8H     A   
 IE0 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.1   A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE     9
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE     9
 
 IE1 . . . . . . . . . . . . . . . . . .    B  ADDR  0088H.3   A   
 IE2 . . . . . . . . . . . . . . . . . .    D  ADDR  00AFH     A   
@@ -599,7 +596,7 @@ P37 . . . . . . . . . . . . . . . . . .    B  ADDR  00B0H.7   A
 P3M0. . . . . . . . . . . . . . . . . .    D  ADDR  00B2H     A   
 P3M1. . . . . . . . . . . . . . . . . .    D  ADDR  00B1H     A   
 P4. . . . . . . . . . . . . . . . . . .    D  ADDR  00C0H     A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE    10
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE    10
 
 P40 . . . . . . . . . . . . . . . . . .    B  ADDR  00C0H.0   A   
 P41 . . . . . . . . . . . . . . . . . .    B  ADDR  00C0H.1   A   
@@ -667,7 +664,7 @@ RB8 . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.2   A
 REN . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.4   A   
 RI. . . . . . . . . . . . . . . . . . .    B  ADDR  0098H.0   A   
 RS0 . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.3   A   
-AX51 MACRO ASSEMBLER  OS_TIMER                                                              12/31/22 20:11:56 PAGE    11
+AX51 MACRO ASSEMBLER  OS_TIMER                                                              01/13/24 16:18:23 PAGE    11
 
 RS1 . . . . . . . . . . . . . . . . . .    B  ADDR  00D0H.4   A   
 RSTCFG. . . . . . . . . . . . . . . . .    D  ADDR  00FFH     A   

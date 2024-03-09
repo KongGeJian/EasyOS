@@ -1,6 +1,6 @@
 ; .\Objects\os_timer.SRC generated from: CODE\OS\os_timer.c
 ; COMPILER INVOKED BY:
-;        C:\DevelopTool\Keil_v5\C51\BIN\C51.EXE CODE\OS\os_timer.c OMF2 OPTIMIZE(1,SPEED) BROWSE INCDIR(C:\DevelopTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS) DEBUG CODE SYMBOLS PRINT(.\Listings\os_timer.lst) PREPRINT(.\Listings\os_timer.i) SRC(.\Objects\os_timer.SRC)
+;        C:\DevTool\Keil_v5\C51\BIN\C51.EXE CODE\OS\os_timer.c OMF2 OPTIMIZE(1,SPEED) BROWSE INCDIR(C:\DevTool\Keil_v5\C51\INC\**;.\CODE\APP;.\CODE\BSP;.\CODE\EXT-LIB;.\CODE\OS) DEBUG CODE SYMBOLS PRINT(.\Listings\os_timer.lst) PREPRINT(.\Listings\os_timer.i) SRC(.\Objects\os_timer.SRC)
 
 $NOMOD51
 
@@ -383,7 +383,7 @@ OS_TIMER_GetUs:
 	MOV  	@R0,#0D1H
 	INC  	R0
 	MOV  	@R0,#020H
-	MOV  	R0,#LOW (tmp2?141)
+	INC  	R0
 	MOV  	@R0,#00H
 	INC  	R0
 	MOV  	@R0,#0CH
@@ -396,11 +396,8 @@ OS_TIMER_GetUs:
 	MOV  	R6,A
 	MOV  	R5,TL0
 	MOV  	R4,#00H
-	MOV  	A,R6
-	ORL  	A,R4
-	MOV  	R6,A
 	MOV  	A,R7
-	ORL  	A,R5
+	MOV  	A,R5
 	MOV  	R7,A
 	MOV  	R0,#LOW (tmp1?140)
 	MOV  	A,@R0
@@ -415,7 +412,7 @@ OS_TIMER_GetUs:
 	MOV  	A,R6
 	SUBB 	A,R4
 	MOV  	R6,A
-	MOV  	R0,#LOW (tmp2?141)
+	INC  	R0
 	MOV  	A,@R0
 	MOV  	R4,A
 	INC  	R0
