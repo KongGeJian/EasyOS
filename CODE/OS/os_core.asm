@@ -63,7 +63,7 @@ T0_ISR:                         ; void T0_ISR() interrupt 1
     INC     DPTR
     MOVX    A,@DPTR
     MOV     R5,A
-    MOV      A,R5
+    MOV     A,R5
     ADD     A,#05H
     MOV     R5,A
     MOV     A,R4

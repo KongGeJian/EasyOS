@@ -25,6 +25,7 @@
 */
 
 #define STACK_DEFVAL 0xA5       //栈默认值
+#define UNREAL_STACK_LEN 13     //虚拟压栈长度 [ACC B DPH DPL PSW AR0-AR7]
 
 //执行中任务
 volatile OS_TASK_TYP xdata * xdata running_task _at_ 0x01F0;
@@ -37,8 +38,6 @@ OS_TASK_LIST_TYP xdata * xdata hidden_task_list _at_ 0x01F6;
 
 //空闲任务栈
 u8 idata idle_task_stack[20];
-//空闲任务名称
-const char code idle_task_name[] = "OS_IdleTask";
 
 
 
@@ -182,6 +181,7 @@ void _StackOverflow_Check(OS_TASK_TYP xdata *task) large
 void _Heap_NotEnough(const char code *func_name, const char code *var) large
 {
     BSP_UART_Println(UART1, "Not enough memory space. func_name=%s var=%p", func_name, var);
+    OS_InterDis();
     while (1);
 }
 
@@ -206,6 +206,7 @@ void OS_Init(void) large
     ready_task_list->top = NULL;
     ready_task_list->end = NULL;
     ready_task_list->size = 0;
+    BSP_UART_Println(UART1, "ready_task_list=%p, t=%p, e=%p", ready_task_list, ready_task_list->top, ready_task_list->end);
 
     blocked_task_list = malloc(sizeof(OS_TASK_LIST_TYP));
     if (blocked_task_list == NULL)
@@ -213,6 +214,7 @@ void OS_Init(void) large
     blocked_task_list->top = NULL;
     blocked_task_list->end = NULL;
     blocked_task_list->size = 0;
+    BSP_UART_Println(UART1, "blocked_task_list=%p, t=%p, e=%p", blocked_task_list, blocked_task_list->top, blocked_task_list->end);
 
     hidden_task_list = malloc(sizeof(OS_TASK_LIST_TYP));
     if (hidden_task_list == NULL)
@@ -220,9 +222,11 @@ void OS_Init(void) large
     hidden_task_list->top = NULL;
     hidden_task_list->end = NULL;
     hidden_task_list->size = 0;
+    BSP_UART_Println(UART1, "hidden_task_list=%p, t=%p, e=%p", hidden_task_list, hidden_task_list->top, hidden_task_list->end);
     
-    //创建守护任务，放在就绪任务栈顶
-    OS_CreateTask(OS_IdleTask, idle_task_name, idle_task_stack, sizeof(idle_task_stack));
+    //创建守护任务，放在就绪任务栈顶，第一个运行
+    OS_CreateTask(OS_IdleTask, "OS_IdleTask", idle_task_stack, sizeof(idle_task_stack));
+    running_task = _Pop_TaskList(ready_task_list);
 
     OS_TIMER_Init();
 }
@@ -236,21 +240,44 @@ void OS_Init(void) large
 */
 void OS_Start(void) large
 {
-    OS_TaskSwitch();
-    if (running_task != NULL)
+    if (running_task == NULL)
     {
-        origin_sp = SP;
-        SP = running_task->stack->sp; //函数RET，弹栈，运行
+        BSP_UART_Println(UART1, "==== OS_Start failed! ====");
+        while (1);
     }
+    origin_sp = SP;
+    SP = running_task->stack->sp - UNREAL_STACK_LEN; //设置第一个任务SP，函数RET弹栈，直接进入第一个任务运行
+    BSP_UART_Println(UART1, "==== OS_Start ====  SP=0x%bX", SP);
+    
     ET0 = 1;    //使能定时器中断
     TR0 = 1;    //启动定时器
 }
 
 /*
 *********************************************************************************************************
+* Description : T0中断 enable
+*********************************************************************************************************
+*/
+void OS_InterEn(void) large
+{
+    ET0 = 1;
+}
+
+/*
+*********************************************************************************************************
+* Description : T0中断 disable
+*********************************************************************************************************
+*/
+void OS_InterDis(void) large
+{
+    ET0 = 0;
+}
+
+/*
+*********************************************************************************************************
 * Description : 任务标记
 *
-* Argument(s) : none.
+* Caller(s)   : T0_ISR() 只能被这个调用
 *
 * Note(s)     : 标记只处理：运行中任务、阻塞中任务
 *********************************************************************************************************
@@ -292,7 +319,7 @@ void OS_TaskMark(void) large
 *********************************************************************************************************
 * Description : 任务切换
 *
-* Argument(s) : none.
+* Caller(s)   : T0_ISR() 只能被这个调用
 *
 * Note(s)     : 在定时器中断中调用此函数。注意不同Bank的影响
 *********************************************************************************************************
@@ -402,7 +429,7 @@ void OS_TaskSignal(OS_TASK_TYP xdata *task, u8 semaphore) large
 
 /*
 *********************************************************************************************************
-* Description : 创建定时任务。
+* Description : 创建任务。
 *
 * Argument(s) : task - 要运行的任务函数
 *               task_name - 任务名
@@ -411,7 +438,7 @@ void OS_TaskSignal(OS_TASK_TYP xdata *task, u8 semaphore) large
 *
 * Return(s)   : 创建好的任务地址
 *
-* Note(s)     : none.
+* Note(s)     : 创建好任务，默认 READY 状态，push 到就绪任务链表中
 *********************************************************************************************************
 */
 OS_TASK_TYP * OS_CreateTask(TaskHook task, const char code *task_name, u8 idata *stack_base, u8 stack_len) large
@@ -423,7 +450,8 @@ OS_TASK_TYP * OS_CreateTask(TaskHook task, const char code *task_name, u8 idata 
     if (stack_len < 16)
     {
         BSP_UART_Println(UART1, "Task stack minimum 16. task_name=%s stack_len=%bu", task_name, stack_len);
-        while(1);
+        OS_InterDis();
+        while (1);
     }
 
     //栈全部初始化成 STACK_DEFVAL，用于栈溢出检测
@@ -443,13 +471,10 @@ OS_TASK_TYP * OS_CreateTask(TaskHook task, const char code *task_name, u8 idata 
     *stack_base = (u16) task;       //任务入口地址压栈
     stack_base++;
     *stack_base = (u16) task >> 8;
-    if (task != OS_IdleTask)        //其他任务模拟压栈
+    for (i = 0; i < UNREAL_STACK_LEN; i++) //任务模拟压栈
     {
-        for (i = 0; i < 13; i++)
-        {
-            stack_base++;
-            *stack_base = 0;        //ACC B DPH DPL PSW AR0-AR7
-        }
+        stack_base++;
+        *stack_base = 0;        //ACC B DPH DPL PSW AR0-AR7
     }
     t_p->stack->sp = stack_base;
 
@@ -483,8 +508,6 @@ void OS_DeleteTask(OS_TASK_TYP xdata *task) large
 *********************************************************************************************************
 * Description : 空闲任务（守护任务）
 *
-* Argument(s) : none.
-*
 * Note(s)     : 用户禁止创建，OS_Start 是自动创建，用于空闲统计、任务回收 等
 *********************************************************************************************************
 */
@@ -492,7 +515,7 @@ void OS_IdleTask(void) large
 {
     while (1)
     {
-        //空闲统计 task->timer
+        //空闲统计 task->timer TODO 有待实现
         //任务回收
         _Delete_Task(hidden_task_list);
         //让出CPU
@@ -514,7 +537,8 @@ void OS_StackOverflow(TaskHook task, const char code *task_name) large
     ET0 = 0;    //关闭T0中断
     TR0 = 0;    //关闭T0
     BSP_UART_Println(UART1, "Stack overflow. task_name=%s task_p=%p", task_name, task);
-    while(1);
+    OS_InterDis();
+    while (1);
 }
 
 /**********************************************END******************************************************/

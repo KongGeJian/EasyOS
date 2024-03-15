@@ -98,6 +98,8 @@ extern OS_TASK_TYP xdata * xdata running_task;
 
 extern void OS_Init(void) large;
 extern void OS_Start(void) large;
+extern void OS_InterEn(void) large;
+extern void OS_InterDis(void) large;
 
 extern void OS_TaskMark(void) large;
 extern void OS_TaskSwitch(void) large;
